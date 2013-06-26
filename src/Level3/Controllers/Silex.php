@@ -14,7 +14,7 @@ use Level3\Messages\RequestFactory;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Level3\Response as Level3Response;
+use Level3\Messages\Response as Level3Response;
 
 class Silex
 {
@@ -86,11 +86,12 @@ class Silex
         $requestHeaders = $request->headers->all();
         $level3Request = $this->requestFactory->clear()
             ->withKey($key)
-            ->witId($id)
+            ->withId($id)
             ->withAttributes($requestAttributes)
             ->withHeaders($requestHeaders)
             ->withContent($content)
             ->create();
+
         return $level3Request;
     }
 
