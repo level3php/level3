@@ -101,6 +101,14 @@ class RequestLogger implements RequestProcessor
         $pathInfo = $request->getPathInfo();
         $name = $request->getCredentials()->getFullName();
         $apiKey = $request->getCredentials()->getApiKey();
-        return sprintf('%s %s - %s(%s)', $method, $pathInfo, $name, $apiKey);
+        
+        $range = $request->getRange();
+
+        $params = '';
+        foreach($request->getCriteria() as $key => $value) {
+            $params = '&'. $params . $key. '=' . $value;
+        }
+        
+        return sprintf('%s %s: %s [Range: %d-%d] - %s(%s)', $method, $pathInfo, $params,$range[0],$range[1], $name, $apiKey);
     }
 }
