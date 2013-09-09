@@ -106,9 +106,9 @@ class RequestLogger implements RequestProcessor
 
         $params = '';
         foreach($request->getCriteria() as $key => $value) {
-            $params = '&'. $params . $key. '=' . $value;
+            $params = '&' . $params . $key . '=' . $value;
         }
         
-        return sprintf('%s %s: %s [Range: %d-%d] - %s(%s)', $method, $pathInfo, $params,$range[0],$range[1], $name, $apiKey);
+        return sprintf('%s %s: %s [Range: %d-%d] - %s(%s)', $method, $pathInfo, $params, $range[0], $range[1], $name, $apiKey);
     }
 }
