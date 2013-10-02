@@ -1,13 +1,13 @@
 <?php
 
-namespace Level3\Security\Authorization;
+namespace Level3\Processor\Wrapper\Authorization;
 
 use Level3\Messages\Processors\RequestProcessor;
 use Level3\Messages\Request;
 use Level3\Messages\ResponseFactory;
 use Level3\Resources\ConfigParser;
 use Level3\Resources\Exceptions\ConfigError;
-use Level3\Security\Authentication\AuthenticatedCredentials;
+use Level3\Processor\Wrapper\Authentication\AuthenticatedCredentials;
 
 class RoleAuthorizationProcessor extends AbstractAuthorizationProcessor
 {
