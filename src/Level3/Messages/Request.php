@@ -4,9 +4,9 @@ namespace Level3\Messages;
 
 use Level3\Resource\FormatterFactory;
 use Level3\Processor\Wrapper\Authenticator\Credentials;
+use Level3\Exceptions\BadRequest;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-use Level3\Messages\Parameters;
 
 class Request extends SymfonyRequest
 {
@@ -55,7 +55,8 @@ class Request extends SymfonyRequest
     {
         $contentTypes = $this->getAcceptableContentTypes();
 
-        return $this->getFormatterFactory()->create($contentTypes, true);
+        $factory = $this->getFormatterFactory();
+        return $factory->create($contentTypes, true);
     }
 
     protected function getFormatterFactory()
@@ -98,9 +99,14 @@ class Request extends SymfonyRequest
 
     public function getContent($none = false)
     {
-        $content = parent::getContent();
+        $raw = parent::getContent();
 
-        return $this->getFormatter()->fromRequest($content);
+        $content = $this->getFormatter()->fromRequest($raw);
+        if ($content === null) {
+            throw new BadRequest();  
+        }
+
+        return $content;
     }
 
     public function getRange()

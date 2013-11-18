@@ -86,13 +86,25 @@ class RequestTest extends TestCase
         $this->assertNull($this->request->isAuthenticated());
     }
 
-    public function testgetContent()
+    public function testGetContent()
     {
         $content = $this->request->getContent();
         $this->assertSame(['foo' => 'bar'], $content);
     }
 
-    public function testgetRawContent()
+    /**
+     * @expectedException Level3\Exceptions\BadRequest
+     */
+    public function testGetContentInvalid()
+    {
+        $symfonyRequest = new SymfonyRequest([], [], [], [], [], [], 'notvalid');
+        $request = new Request(self::IRRELEVANT_KEY, $symfonyRequest);
+
+        $content = $request->getContent();
+        $this->assertSame(['foo' => 'bar'], $content);
+    }
+
+    public function testGetRawContent()
     {
         $content = $this->request->getRawContent();
         $this->assertSame('{"foo":"bar"}', $content);
