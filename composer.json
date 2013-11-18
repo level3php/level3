@@ -3,7 +3,7 @@
     "homepage": "http://github.com/level3php/level3",
     "description": "A RESTful API builder based on 3-level model (URI, HTTP and Hypermedia)",
     "type": "library",
-    "keywords": ["rest", "restfull", "hal", "hateoas"],
+    "keywords": ["rest", "restful", "hal", "hateoas", "siren", "api"],
     "license": "MIT",
     "authors": [
         {
@@ -12,15 +12,17 @@
             "homepage": "http://yunait.com"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
+        "level3/resource": "dev-master",
         "shrikeh/teapot": "0.2",
         "symfony/http-foundation": "2.3.*@dev",
         "psr/log": "~1.0",
         "sabre/xml": "0.0.5"
     },
     "require-dev": {
-        "mockery/mockery": "*",
+        "mockery/mockery": "0.8.0",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
