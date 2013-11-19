@@ -4,191 +4,194 @@ namespace Level3\Tests;
 
 use Level3\Messages\Request;
 use Mockery as m;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RequestTest extends TestCase
 {
     const IRRELEVANT_KEY = 'X';
     const IRRELEVANT_ID = 'XX';
-    const IRRELEVANT_CONTENT = '{"foo":"bar"}';
+    const IRRELEVANT_JSON_CONTENT = '{"foo":"bar"}';
+    const IRRELEVANT_XML_CONTENT = '<xml><foo>bar</foo></xml>';
 
     private $dummySymfonyRequest;
     private $request;
 
     public function setUp()
     {
-        $this->dummySymfonyRequest = new SymfonyRequest([], [], [], [], [], [], self::IRRELEVANT_CONTENT);
-        $this->request = new Request(self::IRRELEVANT_KEY, $this->dummySymfonyRequest);
+        $this->request = new Request();
     }
 
-    public function tearDown()
+    public function testFormatContentJSON()
     {
-        unset($this->dummySymfonyRequest);
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', ['_format' => 'json'], [], [], [],
+            self::IRRELEVANT_JSON_CONTENT
+        );
+
+        $this->assertSame(['foo' => 'bar'], $request->request->all());
     }
 
-    public function testGetFormatter()
+    public function testFormatContentXML()
     {
-        $formatter = $this->request->getFormatter();
-        $this->assertInstanceOf('Level3\Resource\Formatter', $formatter);
-    }
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', ['_format' => 'xml'], [], [], [],
+            self::IRRELEVANT_XML_CONTENT
+        );
 
-    public function testGetKey()
-    {
-        $key = $this->request->getKey();
-        $this->assertThat($key, $this->equalTo(self::IRRELEVANT_KEY));
-    }
-
-    public function testGetParameters()
-    {
-        $attributes = $this->request->getAttributes();
-        $this->assertInstanceOf('Level3\Messages\Parameters', $attributes);
-    }
-
-    public function testGetFilters()
-    {
-        $filters = $this->request->GetFilters();
-        $this->assertInstanceOf('Level3\Messages\Parameters', $filters);
-
-        $data = $filters->all();
-        $this->assertTrue(array_key_exists('range', $data));
-        $this->assertTrue(array_key_exists('sort', $data));
-        $this->assertTrue(array_key_exists('criteria', $data));
-        $this->assertTrue(array_key_exists('expand', $data));
-    }
-
-    public function testGetCriteria()
-    {
-        $this->request->server->add(['QUERY_STRING' => 'foo=bar']);
-
-        $criteria = $this->request->getCriteria();
-        $this->assertSame(['foo' => 'bar'], $criteria);
-    }
-
-    public function testGetCredentials()
-    {
-        $credentials = m::mock('Level3\Processor\Wrapper\Authenticator\Credentials');
-
-        $this->request->setCredentials($credentials);
-        $this->assertSame($credentials, $this->request->getCredentials());
-    }
-
-    public function testIsAuthenticated()
-    {
-        $credentials = m::mock('Level3\Processor\Wrapper\Authenticator\Credentials');
-        $credentials->shouldReceive('isAuthenticated')->once()->andReturn(true);
-
-        $this->request->setCredentials($credentials);
-        $this->assertTrue($this->request->isAuthenticated());
-    }
-
-    public function testIsAuthenticatedNonCredentials()
-    {
-        $this->assertNull($this->request->isAuthenticated());
-    }
-
-    public function testGetContent()
-    {
-        $content = $this->request->getContent();
-        $this->assertSame(['foo' => 'bar'], $content);
+        $this->assertSame(['foo' => 'bar'], $request->request->all());
     }
 
     /**
      * @expectedException Level3\Exceptions\BadRequest
      */
-    public function testGetContentInvalid()
+    public function testFormatContentInvalid()
     {
-        $symfonyRequest = new SymfonyRequest([], [], [], [], [], [], 'notvalid');
-        $request = new Request(self::IRRELEVANT_KEY, $symfonyRequest);
-
-        $content = $request->getContent();
-        $this->assertSame(['foo' => 'bar'], $content);
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', ['_format' => 'xml'], [], [], [],
+            self::IRRELEVANT_JSON_CONTENT
+        );
     }
 
-    public function testGetRawContent()
+    /**
+     * @expectedException Level3\Exceptions\BadRequest
+     */
+    public function testFormatContentNonSupportedFormat()
     {
-        $content = $this->request->getRawContent();
-        $this->assertSame('{"foo":"bar"}', $content);
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', ['_format' => 'foo'], [], [], [],
+            self::IRRELEVANT_JSON_CONTENT
+        );
     }
 
-    public function testGetRange()
+    public function testInitializeRange()
     {
-        $this->request->headers->add(['Range' => 'entity=0-9']);
+        $request = Request::create('http://example.com/', 'GET');
 
-        $range = $this->request->getRange();
-        $this->assertThat($range, $this->equalTo([0,9]));
+        $this->assertNull($request->attributes->get('offset'));
+        $this->assertNull($request->attributes->get('limit'));
     }
 
-    public function testGetRangeWithoutLowerBound()
+    public function testInitializeRangeHeader()
     {
-        $this->request->headers->add(['Range' => 'entity=-9']);
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_Range' => 'entity=10-30'
+        ]);
 
-        $range = $this->request->getRange();
-        $this->assertThat($range, $this->equalTo([0,9]));
+        $this->assertSame(10, $request->attributes->get('offset'));
+        $this->assertSame(20, $request->attributes->get('limit'));
     }
 
-    public function testGetRangeWithoutUpperBound()
+    public function testInitializeRangeParam()
     {
-        $this->request->headers->add(['Range' => 'entity=9-']);
+        $request = Request::create('http://example.com/', 'GET', [
+            '_limit' => 10,
+            '_offset' => 40
+        ]);
 
-        $range = $this->request->getRange();
-        $this->assertThat($range, $this->equalTo([9,0]));
+        $this->assertSame(40, $request->attributes->get('offset'));
+        $this->assertSame(10, $request->attributes->get('limit'));
     }
 
-    public function testGetRangeWithoutHeader()
+    public function testInitializeRangeConflict()
     {
-        $range = $this->request->getRange();
-        $this->assertThat($range, $this->equalTo([0,0]));
+        $request = Request::create('http://example.com/', 'GET', [
+            '_limit' => 10,
+            '_offset' => 40
+        ], [], [], [
+            'HTTP_Range' => 'entity=10-30'
+        ]);
+
+        $this->assertSame(40, $request->attributes->get('offset'));
+        $this->assertSame(10, $request->attributes->get('limit'));
     }
 
-    public function testGetExpand()
+    public function testInitializeSort()
     {
-        $this->request->headers->add(['X-Expand-Links' => 'foo;qux.bar']);
+        $request = Request::create('http://example.com/', 'GET');
 
-        $expand = $this->request->getExpand();
-        $this->assertThat($expand, $this->equalTo([
+        $this->assertNull($request->attributes->get('sort'));
+    }
+
+    public function testInitializeSortHeader()
+    {
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_X-Sort' => ' foo = 1; bar;baz  =-1'
+        ]);
+
+        $this->assertSame([
+            'foo' => 1,
+            'bar' => 1,
+            'baz' => -1
+        ], $request->attributes->get('sort'));
+    }
+
+    public function testInitializeSortParam()
+    {
+        $request = Request::create('http://example.com/', 'GET', [
+            '_sort' => 'foo,-bar',
+        ]);
+
+        $this->assertSame([
+            'foo' => 1,
+            'bar' => -1
+        ], $request->attributes->get('sort'));
+    }
+
+    public function testInitializeSortConflict()
+    {
+        $request = Request::create('http://example.com/', 'GET', [
+            '_sort' => 'foo,-bar',
+        ], [], [], [
+            'HTTP_X-Sort' => ' foo = 1; bar;baz  =-1'
+        ]);
+
+        $this->assertSame([
+            'foo' => 1,
+            'bar' => -1
+        ], $request->attributes->get('sort'));
+    }
+
+    public function testInitializeExpand()
+    {
+        $request = Request::create('http://example.com/', 'GET');
+
+        $this->assertNull($request->attributes->get('expand'));
+    }
+
+    public function testInitializeExpandHeader()
+    {
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_X-Expand-Links' => ' foo,qux.bar'
+        ]);
+
+        $this->assertSame([
             ['foo'],
             ['qux','bar']
-        ]));
+        ], $request->attributes->get('expand'));
     }
 
-    public function testGetExpandWithoutHeader()
+    public function testInitializeExpandParam()
     {
-        $expand = $this->request->getExpand();
-        $this->assertThat($expand, $this->equalTo([]));
+        $request = Request::create('http://example.com/', 'GET', [
+            '_expand' => 'foo,qux.bar',
+        ]);
+
+        $this->assertSame([
+            ['foo'],
+            ['qux','bar']
+        ], $request->attributes->get('expand'));
     }
 
-    public function testGetHeader()
+    public function testInitializeExpandConflict()
     {
-        $this->request->headers->add(['foo'=> ['bar', 'crap']]);
+        $request = Request::create('http://example.com/', 'GET', [
+            '_expand' => 'foo,qux.bar',
+        ], [], [], [
+            'HTTP_X-Expand-Links' => ' bar,qux.bar'
+        ]);
 
-        $header = $this->request->getHeader('foo');
-        $this->assertThat($header, $this->equalTo('bar'));
-    }
-
-    public function testGetSort()
-    {
-        $this->request->headers->add(
-            [Request::HEADER_SORT => ' foo = 1; bar;baz  =-1']
-        );
-
-        $this->assertEquals(
-            ['foo' => 1, 'bar' => 1, 'baz' => -1],
-            $this->request->getSort());
-    }
-
-    public function testGetSortEmpty()
-    {
-        $this->request->headers->add(
-            [Request::HEADER_SORT => '']
-        );
-
-        $this->assertEquals(
-            [],
-            $this->request->getSort());
-    }
-
-    public function testGetSortWithAbsentHeader()
-    {
-        $this->assertSame(null, $this->request->getSort());
+        $this->assertSame([
+            ['foo'],
+            ['qux','bar']
+        ], $request->attributes->get('expand'));
     }
 }
