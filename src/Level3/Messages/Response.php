@@ -22,7 +22,7 @@ class Response extends SymfonyResponse
         $response = new static();
         $response->setStatusCode(StatusCode::OK);
         $response->setResource($resource);
-        //$response->setFormatter($request->getFormatter());
+        $response->setFormatter(new Formatter\HAL\JsonFormatter());
 
         if ($cache = $resource->getCache()) {
             $date = new DateTime();
