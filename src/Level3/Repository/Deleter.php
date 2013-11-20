@@ -2,9 +2,9 @@
 
 namespace Level3\Repository;
 
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface Deleter
 {
-    public function delete(Parameters $attributes);
+    public function delete(ParameterBag $attributes);
 }

@@ -2,11 +2,10 @@
 
 namespace Level3\Processor\Wrapper;
 
+use Level3\Repository;
 use Level3\Messages\Request;
 use Level3\Processor\Wrapper;
 use Level3\Exceptions\Forbidden;
-
-use Closure;
 use UnexpectedValueException;
 
 class BasicIpFirewall extends Wrapper
@@ -61,19 +60,28 @@ class BasicIpFirewall extends Wrapper
         throw new UnexpectedValueException('Malformed IP/CIDR');
     }
 
-    public function error(Closure $execution, Request $request)
+    public function error(
+        Repository $repository, 
+        Request $request, 
+        Callable $execution
+    )
     {
-        return $execution($request);
+        return $execution($repository, $request);
     }
 
-    protected function processRequest(Closure $execution, Request $request, $method)
+    protected function processRequest(
+        Repository $repository,
+        Request $request, 
+        Callable $execution,
+        $method
+    )
     {
         $ip = $request->getClientIp();
         if (!$this->isAuthorizedIp($ip)) {
             throw new Forbidden();
         }
 
-        return $execution($request);
+        return $execution($repository, $request);
     }
 
     protected function isAuthorizedIp($ip)

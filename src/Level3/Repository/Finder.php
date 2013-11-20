@@ -2,9 +2,9 @@
 
 namespace Level3\Repository;
 
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface Finder
 {
-    public function find(Parameters $attributes, Parameters $filters);
+    public function find(ParameterBag $attributes, ParameterBag $filters);
 }

@@ -75,8 +75,6 @@ class ResponseTest extends TestCase
     {
         $formatter = $this->createFormatterMock();
         $request = $this->createRequestMockSimple(false);
-        $request->shouldReceive('getFormatter')
-                ->withNoArgs()->once()->andReturn($formatter);
 
         $response = Response::createFromResource($request, $resource);
 
@@ -91,8 +89,7 @@ class ResponseTest extends TestCase
     {
         $formatter = $this->createFormatterMock();
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getFormatter')
-                ->withNoArgs()->once()->andReturn($formatter);
+       
 
         $exception = new \Exception('foo');
         $response = Response::createFromException($request, $exception);
@@ -112,8 +109,6 @@ class ResponseTest extends TestCase
     {
         $formatter = $this->createFormatterMock();
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getFormatter')
-                ->withNoArgs()->once()->andReturn($formatter);
 
         $exception = new NotAcceptable('foo');
         $response = Response::createFromException($request, $exception);

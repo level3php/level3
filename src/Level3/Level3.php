@@ -2,7 +2,7 @@
 
 namespace Level3;
 
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Level3\Processor\Wrapper;
 
 class Level3
@@ -57,9 +57,9 @@ class Level3
         return $this->hub->get($repositoryKey);
     }
 
-    public function getURI($repositoryKey, $interface = null, Parameters $parameters = null)
+    public function getURI($repositoryKey, $interface = null, ParameterBag $attributes = null)
     {
-        return $this->mapper->getURI($repositoryKey, $interface, $parameters);
+        return $this->mapper->getURI($repositoryKey, $interface, $attributes);
     }
 
     public function clearProcessWrappers()

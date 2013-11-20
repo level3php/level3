@@ -2,9 +2,9 @@
 
 namespace Level3\Repository;
 
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface Putter
 {
-    public function put(Parameters $attributes, Array $data);
+    public function put(ParameterBag $attributes, Array $data);
 }

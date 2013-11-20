@@ -2,8 +2,7 @@
 
 namespace Level3;
 
-use Level3\Repository;
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 abstract class Mapper
 {
@@ -58,13 +57,13 @@ abstract class Mapper
         return $this->baseURI;
     }
 
-    private function transformCurieURI($curieURI, Parameters $parameters = null)
+    private function transformCurieURI($curieURI, ParameterBag $attributes = null)
     {
-        if (!$parameters) {
+        if (!$attributes) {
             return $curieURI;
         }
 
-        foreach ($parameters->all() as $key => $value) {
+        foreach ($attributes->all() as $key => $value) {
             $curieURI = str_replace(sprintf('{%s}', $key), $value, $curieURI);
         }
 
@@ -124,11 +123,15 @@ abstract class Mapper
         $this->$method($repositoryKey, $curieURI);
     }
 
-    public function getURI($repositoryKey, $interface = self::DEFAULT_INTERFACE, Parameters $parameters = null)
+    public function getURI(
+        $repositoryKey, 
+        $interface = self::DEFAULT_INTERFACE, 
+        ParameterBag $attributes = null
+    )
     {
         $curieURI = $this->getCurieURI($repositoryKey, $interface);
 
-        return $this->transformCurieURI($curieURI, $parameters);
+        return $this->transformCurieURI($curieURI, $attributes);
     }
 
     public function getCurieURI($repositoryKey, $interface = null)
@@ -171,7 +174,7 @@ abstract class Mapper
         return sprintf('{%sId}', $name);
     }
 
-    public function getMethods($repository)
+    public function getMethods(Repository $repository)
     {
         $interfaces = array_merge(
             $this->interfacesWithOutParams,

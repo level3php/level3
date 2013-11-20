@@ -2,9 +2,9 @@
 
 namespace Level3\Repository;
 
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface Getter
 {
-    public function get(Parameters $attributes);
+    public function get(ParameterBag $attributes);
 }

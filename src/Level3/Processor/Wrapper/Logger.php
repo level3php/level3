@@ -2,12 +2,12 @@
 
 namespace Level3\Processor\Wrapper;
 
-use Psr\Log\LogLevel;
-use Psr\Log\LoggerInterface;
+use Level3\Repository;
 use Level3\Messages\Request;
 use Level3\Messages\Response;
 use Level3\Processor\Wrapper;
-use Closure;
+use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 
 class Logger extends Wrapper
 {
@@ -18,12 +18,17 @@ class Logger extends Wrapper
         $this->logger = $logger;
     }
 
-    protected function processRequest(Closure $execution, Request $request, $method)
+    protected function processRequest(
+        Repository $repository,
+        Request $request, 
+        Callable $execution,
+        $method
+    )
     {
-        $response = $execution($request);
+        $response = $execution($repository, $request);
 
         $level = $this->getLogLevel($request, $response, $method);
-        $log = $this->getLogMessage($request, $response, $method);
+        $log = $this->getLogMessage($repository, $request, $response, $method);
 
         $this->logger->$level($log, [
             'headers' => $response->headers->all()
@@ -45,9 +50,9 @@ class Logger extends Wrapper
         }
     }
 
-    protected function getLogMessage(Request $request, Response $response, $method)
+    protected function getLogMessage(Repository $repository, Request $request, Response $response, $method)
     {
-        $key = $request->getKey();
+        $key = $repository->getKey();
 
         return sprintf('%s::%s - %s', $key, $method, null);
     }

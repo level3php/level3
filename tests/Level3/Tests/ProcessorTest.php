@@ -3,6 +3,7 @@
 namespace Level3\Tests;
 
 use Teapot\StatusCode;
+use Level3\Repository;
 use Level3\Processor;
 use Level3\Processor\Wrapper;
 use Level3\Messages\Request;
@@ -35,12 +36,13 @@ class ProcessorTest extends TestCase
      */
     public function testMissingRepository()
     {
-        $request = $this->createRequestMock(null, null, null);
-
         $this->level3->shouldReceive('getRepository')
-            ->with(self::IRRELEVANT_KEY)->once()->andThrow(new RuntimeException());
+            ->with(self::IRRELEVANT_KEY)
+            ->once()
+            ->andThrow(new RuntimeException());
 
-        $this->processor->get($request);
+        $request = $this->createRequestMock();
+        $this->processor->get(self::IRRELEVANT_KEY, $request);
     }
 
     /**
@@ -48,97 +50,179 @@ class ProcessorTest extends TestCase
      */
     public function testOptions()
     {
+        $this->repository = $this->createRepositoryMock();
+
+        $this->level3->shouldReceive('getRepository')
+            ->with(self::RELEVANT_KEY)
+            ->once()
+            ->andReturn($this->repository);
+
         $request = $this->createRequestMockSimple();
-        $this->processor->options($request);
+        $this->processor->options(self::RELEVANT_KEY, $request);
     }
 
     /**
-     * @dataProvider provider
+     * @dataProvider errorProvider
      */
-    public function testMethods(
-        $method, $repositoryMock, $attributes, $filters, $content, $resource, 
-        $formatter, $statusCode, $exception = null, $expand = null
-    ) {
-        $repository = $this->$repositoryMock();
+    public function testError($statusCode, $exception)
+    {
+        $repository = $this->createRepositoryMock();
+    
+        $this->level3->shouldReceive('getRepository')
+            ->with(self::RELEVANT_KEY)
+            ->once()
+            ->andReturn($repository);
 
-        if ($exception) {
-            $request = $this->createRequestMock($attributes, $filters, $formatter, $repository, $content, false);
-            $response = $this->processor->$method($request, $exception);
-        } else {
-            $request = $this->createRequestMock($attributes, $filters, $formatter, $repository, $content);
-            if ($expand !== null) {
-                $request->shouldReceive('getExpand')->withNoArgs()->once()->andReturn([$expand]);
-                $resource->shouldReceive('expandLinkedResourcesTree')->with($expand)->once()->andReturn(null);
-            }
-
-            $this->level3ShouldHavePair(self::IRRELEVANT_KEY, $repository);
-
-            if ($filters) {
-                $repository->shouldReceive($method)
-                    ->with($attributes, $filters)->once()->andReturn($resource);
-            } elseif ($content) {
-                $repository->shouldReceive($method)
-                    ->with($attributes, $content)->once()->andReturn($resource);
-            } else {
-                $repository->shouldReceive($method)
-                    ->with($attributes)->once()->andReturn($resource);
-            }
-
-            $response = $this->processor->$method($request);
-        }
+        $request = $this->createRequestMockSimple();
+        $response = $this->processor->error(self::RELEVANT_KEY, $request, $exception);
 
         $this->assertSame($statusCode, $response->getStatusCode());
-        if ($statusCode != StatusCode::NO_CONTENT) {
-            $this->assertSame($formatter, $response->getFormatter());
-            if ($resource) {
-                $this->assertSame($resource, $response->getResource());
-            }
-        }
     }
 
-    public function provider()
+    public function errorProvider()
     {
         return [
             [
-                'find', 'createFinderMock',
-                $this->createParametersMock(), $this->createParametersMock(), null,
-                $this->createResourceMock(), $this->createFormatterMock(),
-                StatusCode::OK, null, ['foo']
-            ],[
-                'get', 'createGetterMock',
-                $this->createParametersMock(), null, null,
-                $this->createResourceMock(), $this->createFormatterMock(),
-                StatusCode::OK, null, []
-            ],[
-                'post', 'createPosterMock',
-                $this->createParametersMock(), null, [true],
-                $this->createResourceMock(), $this->createFormatterMock(),
-                StatusCode::CREATED
-            ],[
-                'put', 'createPutterMock',
-                $this->createParametersMock(), null, [true],
-                $this->createResourceMock(), $this->createFormatterMock(),
-                StatusCode::OK
-            ],[
-                'patch', 'createPatcherMock',
-                $this->createParametersMock(), null, [true],
-                $this->createResourceMock(), $this->createFormatterMock(),
-                StatusCode::OK
-            ],[
-                'delete', 'createDeleterMock',
-                $this->createParametersMock(), null, null,
-                null, null,
-                StatusCode::NO_CONTENT
-            ],[
-                'error', 'createDeleterMock',
-                null, null, null,
-                null, $this->createFormatterMock(),
-                StatusCode::INTERNAL_SERVER_ERROR, new \Exception
-            ],[
-                'error', 'createDeleterMock',
-                null, null, null,
-                null, $this->createFormatterMock(),
-                StatusCode::NOT_FOUND, new NotFound
+                StatusCode::INTERNAL_SERVER_ERROR,
+                new \Exception
+            ],
+            [   StatusCode::NOT_FOUND, 
+                new NotFound
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider methodsProvider
+     */
+    public function testMethods(
+        $statusCode, $method, $repository, $resource,
+        $attributes, $query, $request, $expand
+    )
+    {
+        $this->level3
+            ->shouldReceive('getRepository')->with(self::RELEVANT_KEY)->once()
+            ->andReturn($repository);
+
+        $httpRequest = $this->createRequestMock();
+        $httpRequest->attributes = $attributes;
+        $httpRequest->query = $query;
+        $httpRequest->request = $request;
+ 
+        if ($query) {
+            $repository
+                ->shouldReceive($method)->with($attributes, $query)->once()
+                ->andReturn($resource);
+        } else if ($request) {
+            $repository
+                ->shouldReceive($method)->with($attributes, $request)->once()
+                ->andReturn($resource);
+        } else {
+            $repository
+                ->shouldReceive($method)->with($attributes)->once()
+                ->andReturn($resource);
+        }
+
+        $attributes
+            ->shouldReceive('get')->with('expand')->once()
+            ->andReturn($expand);
+
+        if ($expand) {
+            $resource
+                ->shouldReceive('expandLinkedResourcesTree')->with($expand[0])->once()
+                ->andReturn(null);
+        }
+        
+        $response = $this->processor->$method(self::RELEVANT_KEY, $httpRequest);
+
+        $this->assertSame($statusCode, $response->getStatusCode());
+        if ($statusCode != StatusCode::NO_CONTENT) {
+            $this->assertSame($resource, $response->getResource());
+        }
+    }
+
+    public function methodsProvider()
+    {
+        return [
+            [
+                StatusCode::OK,
+                'find', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
+                null,
+                null
+            ],
+            [
+                StatusCode::OK,
+                'find', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
+                null,
+                [['foo']]
+            ],
+            [
+                StatusCode::OK,
+                'get', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                null,
+                null,
+                null
+            ],
+            [
+                StatusCode::CREATED,
+                'post', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                null,
+                $this->createParameterBagMock(),
+                null
+            ],
+            [
+                StatusCode::OK,
+                'patch', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                null,
+                $this->createParameterBagMock(),
+                null
+            ],
+            [
+                StatusCode::OK,
+                'put', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                null,
+                $this->createParameterBagMock(),
+                null
+            ],
+            [
+                StatusCode::NO_CONTENT,
+                'delete', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                null,
+                null,
+                null
+            ],
+            [
+                StatusCode::NO_CONTENT,
+                'delete', 
+                $this->createFinderMock(),
+                $this->createResourceMock(),
+                $this->createParameterBagMock(), 
+                null,
+                null,
+                null
             ]
         ];
     }
@@ -152,12 +236,14 @@ class ProcessorTest extends TestCase
 
 class WrapperMock extends Wrapper
 {
-    private $id;
-    private $sign;
-
-    protected function processRequest(Closure $execution, Request $request, $method)
+    protected function processRequest(
+        Repository $repository, 
+        Request $request, 
+        Callable $execution, 
+        $method
+    )
     {
-        $response = $execution($request);
+        $response = $execution($repository, $request);
 
         return $response;
     }

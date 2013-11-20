@@ -36,13 +36,14 @@ class AuthenticatorTest extends TestCase
      */
     public function testAuthentication($method)
     {
+        $repository = $this->createRepositoryMock();
         $request = $this->createResponseMock();
         $execution = function ($request) use ($request) {
             return $request;
         };
 
         $wrapper = $this->createWrapper($method);
-        $wrapper->$method($execution, $this->request);
+        $wrapper->$method($repository, $this->request, $execution);
     }
 
     public function provider()
@@ -59,9 +60,9 @@ class AuthenticatorTest extends TestCase
 
     public function testErrorAuthentication()
     {
-        $request = $this->createResponseMock(); ;
-        $execution = function ($request) use ($request) {
-            return $request;
+        $response = $this->createResponseMock(); ;
+        $execution = function ($repository, $request) use ($response) {
+            return $response;
         };
 
         $request = $this->createRequestMockSimple();
@@ -72,9 +73,10 @@ class AuthenticatorTest extends TestCase
         $wrapper = new Authenticator();
         $wrapper->addMethod($method);
 
+        $repository = $this->createRepositoryMock();
         $this->assertInstanceOf(
             'Level3\Messages\Response',
-            $wrapper->error($execution, $request)
+            $wrapper->error($repository, $request, $execution)
         );
     }
 
@@ -157,12 +159,13 @@ class AuthenticatorTest extends TestCase
         $auth->addMethod($method);
         $auth->setLevel3($level3);
 
+        $repository = $this->createRepositoryMock();
         $request = $this->createRequestMockSimple();
         $response = $this->createResponseMock();
-        $execution = function ($request) use ($response) {
+        $execution = function ($repository, $request) use ($response) {
             return $response;
         };
 
-        $auth->error($execution, $request);
+        $auth->error($repository, $request, $execution);
     }
 }

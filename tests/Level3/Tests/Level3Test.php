@@ -57,10 +57,10 @@ class Level3Test extends TestCase
 
     public function testGetURI()
     {
-        $parameters = $this->createParametersMock();
-        $this->mapperMock->shouldReceive('getURI')->once()->with('foo', 'bar', $parameters)->andReturn('foo');
+        $attributes = $this->createParameterBagMock();
+        $this->mapperMock->shouldReceive('getURI')->once()->with('foo', 'bar', $attributes)->andReturn('foo');
 
-        $this->assertSame('foo', $this->level3->getURI('foo', 'bar', $parameters));
+        $this->assertSame('foo', $this->level3->getURI('foo', 'bar', $attributes));
     }
 
     public function testAddProcessorWrapperBoth()

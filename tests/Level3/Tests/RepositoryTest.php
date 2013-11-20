@@ -2,7 +2,7 @@
 
 namespace Level3\Tests;
 
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class RepositoryTest extends TestCase
 {
@@ -32,7 +32,7 @@ class RepositoryTest extends TestCase
         $uri = 'qux';
         $key = 'foo';
         $method = 'bar';
-        $attributes = $this->createParametersMock();
+        $attributes = $this->createParameterBagMock();
 
         $this->level3->shouldReceive('getURI')
             ->with($key, $method, $attributes)->once()
@@ -52,7 +52,7 @@ class RepositoryTest extends TestCase
     {
         $uri = 'qux';
         $key = 'foo';
-        $attributes = $this->createParametersMock();
+        $attributes = $this->createParameterBagMock();
 
         $this->level3->shouldReceive('getURI')
             ->with($key, null, $attributes)->once()
@@ -80,10 +80,10 @@ class RepositoryTestMock
         \Level3\Repository\Deleter,
         \Level3\Repository\Patcher
 {
-    public function delete(Parameters $attributes) {}
-    public function get(Parameters $attributes) {}
-    public function post(Parameters $attributes, Array $data) {}
-    public function put(Parameters $attributes, Array $data) {}
-    public function patch(Parameters $attributes, Array $data) {}
-    public function find(Parameters $attributes, Parameters $filters) {}
+    public function delete(ParameterBag $attributes) {}
+    public function get(ParameterBag $attributes) {}
+    public function post(ParameterBag $attributes, Array $data) {}
+    public function put(ParameterBag $attributes, Array $data) {}
+    public function patch(ParameterBag $attributes, Array $data) {}
+    public function find(ParameterBag $attributes, ParameterBag $filters) {}
 }

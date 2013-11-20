@@ -2,13 +2,11 @@
 
 namespace Level3\Processor\Wrapper;
 
+use Level3\Repository;
 use Level3\Messages\Request;
 use Level3\Messages\Response;
-
 use Level3\Processor\Wrapper;
 use Level3\Processor\Wrapper\Authenticator\Method;
-
-use Closure;
 
 class Authenticator extends Wrapper
 {
@@ -40,23 +38,32 @@ class Authenticator extends Wrapper
         return $result;
     }
 
-    public function error(Closure $execution, Request $request)
+    public function error(
+        Repository $repository, 
+        Request $request, 
+        Callable $execution
+    )
     {
         $this->setAllowCredentialsIfNeeded();
 
-        $response = $execution($request);
+        $response = $execution($repository, $request);
         $this->modifyResponse($response, 'error');
 
         return $response;
     }
 
-    protected function processRequest(Closure $execution, Request $request, $httpMethod)
+    protected function processRequest(
+        Repository $repository,
+        Request $request, 
+        Callable $execution,
+        $method
+    )
     {
         $this->setAllowCredentialsIfNeeded();
 
-        $this->authenticateRequest($request, $httpMethod);
-        $response = $execution($request);
-        $this->modifyResponse($response, $httpMethod);
+        $this->authenticateRequest($request, $method);
+        $response = $execution($repository, $request);
+        $this->modifyResponse($response, $method);
 
         return $response;
     }

@@ -7,6 +7,7 @@ use Mockery as m;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
+    const RELEVANT_KEY = 'Y';
     const IRRELEVANT_KEY = 'X';
     const IRRELEVANT_HREF = 'XX';
 
@@ -96,9 +97,9 @@ class TestCase extends \PHPUnit_Framework_TestCase
         return $formatter;
     }
 
-    protected function createParametersMock()
+    protected function createParameterBagMock()
     {
-        $parameters = m::mock('Level3\Messages\Parameters');
+        $parameters = m::mock('Symfony\Component\HttpFoundation\ParameterBag');
         $parameters->shouldReceive('getIterator');
 
         return $parameters;
@@ -118,10 +119,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
     {
         return m::mock('Level3\Messages\Response');
     }
-
+/*
     protected function createRequestMock(
-        $attributes = null, $filters = null, $formatter = null,
-        $repository = null, $content = null, $key = self::IRRELEVANT_KEY
+        $attributes = null, $query = null, $formatter = null,
+        $repository = null, $request = null, $key = self::IRRELEVANT_KEY
     ) {
         $request = $this->createRequestMockSimple();
         if ($key) {
@@ -130,25 +131,23 @@ class TestCase extends \PHPUnit_Framework_TestCase
         }
 
         if ($attributes) {
-            $request->shouldReceive('getAttributes')
-                ->withNoArgs()->once()->andReturn($attributes);
+            $request->attributes = $attributes;
         }
 
-        if ($filters) {
-            $request->shouldReceive('getFilters')
-                ->withNoArgs()->once()->andReturn($filters);
+        if ($query) {
+            $request->query = $query;
         }
 
-        if ($content) {
-            $request->shouldReceive('getContent')
-                ->withNoArgs()->once()->andReturn($content);
+        if ($request) {
+            $request->request = $request;
         }
 
-        if ($formatter) {
-            $request->shouldReceive('getFormatter')
-                ->withNoArgs()->once()->andReturn($formatter);
-        }
-
+        return $request;
+    }
+*/
+    protected function createRequestMock() {
+        $request = $this->createRequestMockSimple();
+        
         return $request;
     }
 }

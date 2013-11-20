@@ -3,6 +3,7 @@
 namespace Level3\Processor;
 
 use Level3\Level3;
+use Level3\Repository;
 use Level3\Messages\Request;
 use Closure;
 
@@ -20,45 +21,50 @@ abstract class Wrapper
         return $this->level3;
     }
 
-    public function find(Closure $execution, Request $request)
+    public function find(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function get(Closure $execution, Request $request)
+    public function get(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function post(Closure $execution, Request $request)
+    public function post(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function put(Closure $execution, Request $request)
+    public function put(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function patch(Closure $execution, Request $request)
+    public function patch(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function delete(Closure $execution, Request $request)
+    public function delete(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function options(Closure $execution, Request $request)
+    public function options(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function error(Closure $execution, Request $request)
+    public function error(Repository $repository, Request $request, Callable $execution)
     {
-        return $this->processRequest($execution, $request, __FUNCTION__);
+        return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    abstract protected function processRequest(Closure $execution, Request $request, $method);
+    abstract protected function processRequest(
+        Repository $repository,
+        Request $request, 
+        Callable $execution,
+        $method
+    );
 }

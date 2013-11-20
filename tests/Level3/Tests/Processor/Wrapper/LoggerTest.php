@@ -31,9 +31,16 @@ class LoggerTest extends TestCase
         $response = new Response();
         $response->setStatusCode($code);
 
-        $expected = $this->wrapper->$method(function($request) use ($response, $code) {
-            return $response;
-        }, $request);
+        $repository = $this->createRepositoryMock();
+        $repository->shouldReceive('getKey')
+            ->once()->andReturn('foo');
+
+        $expected = $this->wrapper->$method(
+            $repository, $request, 
+            function($repository, $request) use ($response, $code) {
+                return $response;
+            }
+        );
 
         $this->assertSame($response, $expected);
     }

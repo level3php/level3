@@ -20,8 +20,9 @@ class BasicIpFirewallTest extends TestCase
 
     public function testError()
     {
+        $repository = $this->createRepositoryMock();
         $request = $this->createResponseMock();
-        $execution = function ($request) use ($request) {
+        $execution = function ($repository, $request) use ($request) {
             return $request;
         };
 
@@ -30,7 +31,7 @@ class BasicIpFirewallTest extends TestCase
 
         $this->assertInstanceOf(
             'Level3\Messages\Response',
-            $wrapper->error($execution, $request)
+            $wrapper->error($repository, $request, $execution)
         );
     }
 
@@ -40,29 +41,31 @@ class BasicIpFirewallTest extends TestCase
     public function testNotIsInWhitelist()
     {
         $wrapper = $this->createWrapper();
+        $repository = $this->createRepositoryMock();
 
         $request = $this->createRequestMockSimple();
         $request->shouldReceive('getClientIp')->once()->andReturn(self::EXAMPLE_IP_A);
 
         $wrapper->addIpToWhitelist(self::EXAMPLE_CIDR);
 
-        $wrapper->get(function ($request) {
+        $wrapper->get($repository, $request, function ($repository, $request) {
             return new Response();
-        }, $request);
+        });
     }
 
     public function testIsInWhitelist()
     {
         $wrapper = $this->createWrapper();
+        $repository = $this->createRepositoryMock();
 
         $request = $this->createRequestMockSimple();
         $request->shouldReceive('getClientIp')->once()->andReturn(self::EXAMPLE_IP_B);
 
         $wrapper->addIpToWhitelist(self::EXAMPLE_CIDR);
 
-        $expected = $wrapper->get(function ($request) {
+        $expected = $wrapper->get($repository, $request, function ($repository, $request) {
             return new Response();
-        }, $request);
+        });
 
         $this->assertInstanceOf('Level3\Messages\Response', $expected);
     }
@@ -73,27 +76,29 @@ class BasicIpFirewallTest extends TestCase
     public function testIsInBlacklist()
     {
         $wrapper = $this->createWrapper();
+        $repository = $this->createRepositoryMock();
 
         $request = $this->createRequestMockSimple();
         $request->shouldReceive('getClientIp')->once()->andReturn(self::EXAMPLE_IP_B);
 
         $wrapper->addIpToBlacklist(self::EXAMPLE_CIDR);
 
-        $expected = $wrapper->get(function () {
+        $wrapper->get($repository, $request, function ($repository, $request) {
             return new Response();
-        }, $request);
+        });
     }
 
     public function testDefault()
     {
         $wrapper = $this->createWrapper();
+        $repository = $this->createRepositoryMock();
 
         $request = $this->createRequestMockSimple();
         $request->shouldReceive('getClientIp')->once()->andReturn(self::EXAMPLE_IP_B);
 
-        $expected = $wrapper->get(function ($request) {
+        $expected = $wrapper->get($repository, $request, function ($repository, $request) {
             return new Response();
-        }, $request);
+        });
 
         $this->assertInstanceOf('Level3\Messages\Response', $expected);
     }
@@ -101,15 +106,16 @@ class BasicIpFirewallTest extends TestCase
     public function testNotIsInBlacklist()
     {
         $wrapper = $this->createWrapper();
+        $repository = $this->createRepositoryMock();
 
         $request = $this->createRequestMockSimple();
         $request->shouldReceive('getClientIp')->once()->andReturn(self::EXAMPLE_IP_B);
 
         $wrapper->addIpToWhitelist(self::EXAMPLE_CIDR);
 
-        $expected = $wrapper->get(function ($request) {
+        $expected = $wrapper->get($repository, $request, function ($request) {
             return new Response();
-        }, $request);
+        });
 
         $this->assertInstanceOf('Level3\Messages\Response', $expected);
     }

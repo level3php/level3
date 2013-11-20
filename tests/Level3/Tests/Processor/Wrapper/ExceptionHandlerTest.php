@@ -23,17 +23,19 @@ class ExceptionHandlerTest extends TestCase
 
     public function testErrorAuthentication()
     {
-        $request = $this->createResponseMock();
-        $execution = function ($request) use ($request) {
-            return $request;
-        };
+        $response = $this->createResponseMock();
 
+        $repository = $this->createRepositoryMock();
         $request = $this->createRequestMockSimple();
         $wrapper = new ExceptionHandler();
 
+        $execution = function ($repository, $request) use ($response) {
+            return $response;
+        };
+
         $this->assertInstanceOf(
             'Level3\Messages\Response',
-            $wrapper->error($execution, $request)
+            $wrapper->error($repository, $request, $execution)
         );
     }
 
@@ -42,14 +44,23 @@ class ExceptionHandlerTest extends TestCase
      */
     public function testExceptionHandling($method, $exception)
     {
-        $request = $this->createRequestMock(null, null, null);
-        $this->processor->shouldReceive('error')
-            ->once()->with($request, $exception);
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->shouldReceive('getKey')
+            ->withNoArgs()->once()
+            ->andReturn('key');
 
-        $this->wrapper->$method(function($request) use ($exception) {
-            $request->getKey();
-            throw $exception;
-        }, $request);
+        $request = $this->createRequestMock(null, null, null);
+        $this->processor
+            ->shouldReceive('error')->once()
+            ->with('key', $request, $exception);
+
+        $expected = $this->wrapper->$method(
+            $repository, $request, 
+            function($repository, $request) use ($exception) {
+                throw $exception;
+            }
+        );
     }
 
     public function provider()

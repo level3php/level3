@@ -2,6 +2,7 @@
 
 namespace Level3;
 
+
 use Level3\Resource\Resource;
 use Level3\Exceptions\NotFound;
 use Level3\Exceptions\NotImplemented;
@@ -22,53 +23,51 @@ class Processor
         $this->level3 = $level3;
     }
 
-    public function find(Request $request)
+    public function find($key, Request $request)
     {
-        return $this->execute('find', $request, function (Request $request) {
-            $key = $request->getKey();
-            $repository = $this->getRepository($key);
-
-            $attributes = $request->getAttributes();
-            $filters = $request->getFilters();
-            $resource = $repository->find($attributes, $filters);
-
-            $this->applyExpandToResource($request->getExpand(), $resource);
+        return $this->execute('find', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) {
+            $resource = $repository->find($request->attributes, $request->query);
+            $this->expandLinkedResources($request, $resource);
 
             return Response::createFromResource($request, $resource);
         });
     }
 
-    public function get(Request $request)
+    public function get($key, Request $request)
     {
-        return $this->execute('get', $request, function (Request $request) {
-            $key = $request->getKey();
-            $repository = $this->getRepository($key);
-
-            $attributes = $request->getAttributes();
-            $resource = $repository->get($attributes);
-
-            $this->applyExpandToResource($request->getExpand(), $resource);
+        return $this->execute('get', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) {
+            $resource = $repository->get($request->attributes);
+            $this->expandLinkedResources($request, $resource);
 
             return Response::createFromResource($request, $resource);
         });
     }
 
-    protected function applyExpandToResource(Array $paths, Resource $resource)
+    protected function expandLinkedResources(Request $request, Resource $resource)
     {
+        $paths = $request->attributes->get('expand');
+        if (!$paths) {
+            return;
+        }
+
         foreach ($paths as $path) {
             $resource->expandLinkedResourcesTree($path);
         }
     }
 
-    public function post(Request $request)
+    public function post($key, Request $request)
     {
-        return $this->execute('post', $request, function (Request $request) {
-            $key = $request->getKey();
-            $repository = $this->getRepository($key);
-
-            $attributes = $request->getAttributes();
-            $content = $request->getContent();
-            $resource = $repository->post($attributes, $content);
+        return $this->execute('post', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) {
+            $resource = $repository->post($request->attributes, $request->request);
 
             $response = Response::createFromResource($request, $resource);
             $response->setStatusCode(StatusCode::CREATED);
@@ -77,71 +76,76 @@ class Processor
         });
     }
 
-    public function patch(Request $request)
+    public function patch($key, Request $request)
     {
-        return $this->execute('patch', $request, function (Request $request) {
-            $key = $request->getKey();
-            $repository = $this->getRepository($key);
-
-            $attributes = $request->getAttributes();
-            $content = $request->getContent();
-            $resource = $repository->patch($attributes, $content);
+        return $this->execute('patch', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) {
+            $resource = $repository->patch($request->attributes, $request->request);
 
             return Response::createFromResource($request, $resource);
         });
     }
 
-    public function put(Request $request)
+    public function put($key, Request $request)
     {
-        return $this->execute('put', $request, function (Request $request) {
-            $key = $request->getKey();
-            $repository = $this->getRepository($key);
-
-            $attributes = $request->getAttributes();
-            $content = $request->getContent();
-            $resource = $repository->put($attributes, $content);
+        return $this->execute('put', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) {
+            $resource = $repository->put($request->attributes, $request->request);
 
             return Response::createFromResource($request, $resource);
         });
     }
 
-    public function delete(Request $request)
+    public function delete($key, Request $request)
     {
-        return $this->execute('delete', $request, function (Request $request) {
-            $key = $request->getKey();
-            $repository = $this->getRepository($key);
-
-            $attributes = $request->getAttributes();
-            $repository->delete($attributes);
+        return $this->execute('delete', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) {
+            $repository->delete($request->attributes);
 
             return new Response(null, StatusCode::NO_CONTENT);
         });
     }
 
-    public function options(Request $request)
+    public function options($key, Request $request)
     {
-        return $this->execute('options', $request, function () {
+        return $this->execute('options', $key, $request, function () {
             throw new NotImplemented();
         });
     }
 
-    public function error(Request $request, Exception $exception)
+    public function error($key, Request $request, Exception $exception)
     {
-        return $this->execute('error', $request, function (Request $request) use ($exception) {
+        return $this->execute('error', $key, $request, function (
+            Repository $repository, 
+            Request $request
+        ) use ($exception) {
             return Response::createFromException($request, $exception);
         });
     }
 
-    protected function execute($method, Request $request, Closure $execution)
+    protected function execute($method, $key, Request $request, Callable $execution)
     {
-        $wrappers = $this->level3->getProcessorWrappers();
-        foreach ($wrappers as $wrapper) {
-            $execution = function ($request) use ($execution, $method, $wrapper) {
-                return $wrapper->$method($execution, $request);
+        $repository = $this->getRepository($key);
+        foreach ($this->getProcessorWrappers() as $wrapper) {
+            $execution = function (Repository $repository, Request $request) use (
+                $wrapper, $method, $repository, $execution
+            ) {
+                return $wrapper->$method($repository, $request, $execution);
             };
         }
 
-        return $execution($request);
+        return $execution($repository, $request);
+    }
+
+    protected function getProcessorWrappers()
+    {
+        return $this->level3->getProcessorWrappers();
     }
 
     protected function getRepository($key)

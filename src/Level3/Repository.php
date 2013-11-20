@@ -3,7 +3,7 @@
 namespace Level3;
 
 use Level3\Resource\Resource;
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use ReflectionClass;
 
 abstract class Repository
@@ -30,7 +30,7 @@ abstract class Repository
         return $this->repositoryKey;
     }
 
-    public function getURI(Parameters $attributes = null, $method = null)
+    public function getURI(ParameterBag $attributes = null, $method = null)
     {
         $key = $this->getKey();
 
@@ -47,7 +47,7 @@ abstract class Repository
         return $description;
     }
 
-    public function createResource(Parameters $attributes = null)
+    public function createResource(ParameterBag $attributes = null)
     {
         $uri = $this->getURI($attributes);
 

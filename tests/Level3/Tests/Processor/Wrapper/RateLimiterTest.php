@@ -24,9 +24,16 @@ class RateLimiterTest extends TestCase
     {
         if (!$request) $request = $this->createRequestMockSimple();
         if (!$response) $response = new Response();
-        return $wrapper->$method(function ($request) use ($response) {
-            return $response;
-        }, $request);
+
+        $repository = $this->createRepositoryMock();
+
+        return $wrapper->$method(
+            $repository, 
+            $request, 
+            function ($repository, $request) use ($response) {
+                return $response;
+            }
+        );
     }
 
     public function testHeaderLimit()

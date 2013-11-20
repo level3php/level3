@@ -2,14 +2,13 @@
 
 namespace Level3\Processor\Wrapper;
 
+use Level3\Repository;
 use Level3\Messages\Request;
 use Level3\Messages\Response;
-
 use Level3\Processor\Wrapper;
 use Level3\Exceptions\Forbidden;
 
 use RuntimeException;
-use Closure;
 use Teapot\StatusCode;
 
 class CrossOriginResourceSharing extends Wrapper
@@ -38,11 +37,7 @@ class CrossOriginResourceSharing extends Wrapper
     protected $maxAge;
     protected $allowCredentials;
     protected $allowMethods = true;
-    protected $allowHeaders = [
-        Request::HEADER_RANGE,
-        Request::HEADER_SORT,
-        request::HEADER_EXPAND
-    ];
+    protected $allowHeaders = [];
 
     public function setAllowOrigin($allowOrigin)
     {
@@ -146,21 +141,30 @@ class CrossOriginResourceSharing extends Wrapper
         return $this->allowHeaders;
     }
 
-    public function options(Closure $execution, Request $request)
+    public function options(
+        Repository $repository,
+        Request $request,
+        Callable $execution
+    )
     {
         $response = new Response();
         $response->setStatusCode(StatusCode::NO_CONTENT);
-        $this->applyResponseHeaders($request, $response, 'options');
+        $this->applyResponseHeaders($repository, $request, $response, 'options');
 
         return $response;
     }
 
-    protected function processRequest(Closure $execution, Request $request, $method)
+    protected function processRequest(
+        Repository $repository,
+        Request $request, 
+        Callable $execution,
+        $method
+    )
     {
         $this->readAndCheckRequestHeaders($request, $method);
 
-        $response = $execution($request);
-        $this->applyResponseHeaders($request, $response, $method);
+        $response = $execution($repository, $request);
+        $this->applyResponseHeaders($repository, $request, $response, $method);
 
         return $response;
     }
@@ -189,10 +193,15 @@ class CrossOriginResourceSharing extends Wrapper
         }
     }
 
-    protected function applyResponseHeaders(Request $request, Response $response, $method)
+    protected function applyResponseHeaders(
+        Repository $repository, 
+        Request $request, 
+        Response $response, 
+        $method
+    )
     {
         $this->applyAllowOriginHeader($request, $response, $method);
-        $this->applyAllowMethods($request, $response, $method);
+        $this->applyAllowMethods($repository, $request, $response, $method);
         $this->applyAllowHeaders($request, $response, $method);
         $this->applyMaxAge($request, $response, $method);
         $this->applyExposeHeaders($request, $response, $method);
@@ -290,7 +299,7 @@ class CrossOriginResourceSharing extends Wrapper
         $response->addHeader(self::HEADER_ALLOW_CRENDENTIALS, $header);
     }
 
-    protected function applyAllowMethods(Request $request, Response $response, $method)
+    protected function applyAllowMethods(Repository $repository, Request $request, Response $response, $method)
     {
         if (!$this->allowMethods) {
             return;
@@ -300,18 +309,10 @@ class CrossOriginResourceSharing extends Wrapper
             return;
         }
 
-        $methods = $this->getAvailableMethods($request);
+        $methods = $this->getLevel3()->getMapper()->getMethods($repository);
 
         $header = implode(', ', $methods);
         $response->addHeader(self::HEADER_ALLOW_METHODS, $header);
-    }
-
-    protected function getAvailableMethods(Request $request)
-    {
-        $key = $request->getKey();
-        $repository = $this->getLevel3()->getHub()->get($key);
-
-        return $this->getLevel3()->getMapper()->getMethods($repository);
     }
 
     protected function applyAllowHeaders(Request $request, Response $response, $method)

@@ -3,7 +3,7 @@
 namespace Level3\Tests;
 
 use Level3\Hub;
-use Level3\Messages\Parameters;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Mockery as m;
 
@@ -131,7 +131,7 @@ class MapperTest extends TestCase
             $mapper->getURI(
                 'foo',
                 'Level3\Repository\Deleter',
-                new Parameters(['fooId' => 1])
+                new ParameterBag(['fooId' => 1])
             )
         );
     }
@@ -182,28 +182,27 @@ class RepositoryMock
         \Level3\Repository\Deleter,
         \Level3\Repository\Patcher
 {
-    public function delete(Parameters $attributes)
+    public function delete(ParameterBag $attributes)
     {
     }
 
-    public function get(Parameters $attributes)
+    public function get(ParameterBag $attributes)
     {
     }
 
-    public function post(Parameters $attributes, Array $data)
+    public function post(ParameterBag $attributes, Array $data)
     {
     }
 
-    public function put(Parameters $attributes, Array $data)
+    public function put(ParameterBag $attributes, Array $data)
     {
     }
     
-    public function patch(Parameters $attributes, Array $data)
+    public function patch(ParameterBag $attributes, Array $data)
     {
     }
 
-    public function find(Parameters $attributes, Parameters $filters)
-    {
-
+    public function find(ParameterBag $attributes, ParameterBag $filters)
+    {   
     }
 }

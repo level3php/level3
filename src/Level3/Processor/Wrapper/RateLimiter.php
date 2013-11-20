@@ -2,13 +2,12 @@
 
 namespace Level3\Processor\Wrapper;
 
+use Level3\Repository;
 use Level3\Messages\Request;
 use Level3\Messages\Response;
 use Level3\Processor\Wrapper;
 use Level3\Exceptions\TooManyRequest;
-
 use Redis;
-use Closure;
 
 class RateLimiter extends Wrapper
 {
@@ -36,7 +35,12 @@ class RateLimiter extends Wrapper
         $this->resetAfterSecs = $secs;
     }
 
-    protected function processRequest(Closure $execution, Request $request, $method)
+    protected function processRequest(
+        Repository $repository,
+        Request $request, 
+        Callable $execution,
+        $method
+    )
     {
         $key = $this->getKey($request);
 
@@ -50,7 +54,7 @@ class RateLimiter extends Wrapper
             $remaining = $this->limit - $this->increaseAndReturnCount($key);
         }
 
-        $response = $execution($request);
+        $response = $execution($repository, $request);
 
         $reset = $this->getResetDate($key);
         $this->addHeadersToResponse($response, $remaining, $reset);
