@@ -6,5 +6,5 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface Poster
 {
-    public function post(ParameterBag $attributes, Array $data);
+    public function post(ParameterBag $attributes, ParameterBag $data);
 }

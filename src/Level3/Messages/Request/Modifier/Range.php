@@ -8,12 +8,12 @@ trait Range
     protected function initializeRange()
     {
         $range = $this->extractRangeFromParameters();
-        if (!$range['offset'] || !$range['limit']) {
+        if (!$range['offset'] && !$range['limit']) {
             $range = $this->extractRangeFromHeader();
         }
-        
-        $this->attributes->set('offset', $range['offset']);
-        $this->attributes->set('limit', $range['limit']);
+
+        $this->attributes->set('_offset', $range['offset']);
+        $this->attributes->set('_limit', $range['limit']);
     }
 
     private function extractRangeFromParameters()

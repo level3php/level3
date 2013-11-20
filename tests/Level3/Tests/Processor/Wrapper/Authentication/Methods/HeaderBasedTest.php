@@ -17,7 +17,7 @@ class HeaderBasedTest extends TestCase
         $method = new HeaderBasedMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->once()->andReturn(null);
 
@@ -30,7 +30,7 @@ class HeaderBasedTest extends TestCase
         $method->continueWithoutAuthentication(true);
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->once()->andReturn(null);
 
@@ -38,7 +38,7 @@ class HeaderBasedTest extends TestCase
         $response->shouldReceive('getStatusCode')
             ->once()->andReturn(StatusCode::UNAUTHORIZED);
 
-        $response->shouldReceive('setHeader')
+        $response->headers->shouldReceive('set')
             ->once()->with(HeaderBasedMock::WWW_AUTHENTICATE_HEADER, 'Basic')
             ->andReturn(StatusCode::UNAUTHORIZED);
 
@@ -51,7 +51,7 @@ class HeaderBasedTest extends TestCase
         $method = new HeaderBasedMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic foo');
 
@@ -69,9 +69,10 @@ class HeaderBasedTest extends TestCase
         $method = new HeaderBasedMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic bar');
+
 
         $method->authenticateRequest($request, 'get');
     }
@@ -84,7 +85,7 @@ class HeaderBasedTest extends TestCase
         $method = new HeaderBasedMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Foo QWxhZGRpbjpvcGVuHNlc2FtZQ==');
 
@@ -99,7 +100,7 @@ class HeaderBasedTest extends TestCase
         $method = new HeaderBasedMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: QWxhZGRpbjpvcGVuHNlc2FtZQ==');
 

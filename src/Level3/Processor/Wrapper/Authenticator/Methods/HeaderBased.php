@@ -36,12 +36,12 @@ abstract class HeaderBased implements Method
 
         $this->verifyAuthorizationHeader($request);
         $this->modifyRequest($request, $httpMethod);
-
     }
 
     protected function hasAuthorizationHeader(Request $request)
+
     {
-        return $request->getHeader(static::AUTHORIZATION_HEADER) !== null;
+        return $request->headers->get(static::AUTHORIZATION_HEADER) !== null;
     }
 
     private function verifyAuthorizationHeader(Request $request)
@@ -59,7 +59,7 @@ abstract class HeaderBased implements Method
 
     protected function getCredentialFromAuthorizationHeader(Request $request)
     {
-        $header = $request->getHeader(static::AUTHORIZATION_HEADER);
+        $header = $request->headers->get(static::AUTHORIZATION_HEADER);
 
         preg_match_all('/(?P<scheme>[a-z]+) (?P<token>.*)$/i', $header, $data);
 
@@ -71,7 +71,7 @@ abstract class HeaderBased implements Method
     }
 
     protected function verifyScheme(Request $request, $scheme)
-    {
+    {        
         return strtolower($this->scheme) == strtolower($scheme);
     }
 
@@ -81,7 +81,7 @@ abstract class HeaderBased implements Method
             return null;
         }
 
-        $response->setHeader(self::WWW_AUTHENTICATE_HEADER, $this->scheme);
+        $response->headers->set(self::WWW_AUTHENTICATE_HEADER, $this->scheme);
     }
 
     abstract protected function verifyToken(Request $request, $token);

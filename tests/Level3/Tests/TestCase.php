@@ -112,13 +112,20 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function createRequestMockSimple()
     {
-        return m::mock('Level3\Messages\Request');
+        $request = m::mock('Level3\Messages\Request');
+        $request->headers = $this->createParameterBagMock();
+
+        return $request;
     }
 
     protected function createResponseMock()
     {
-        return m::mock('Level3\Messages\Response');
+        $response = m::mock('Level3\Messages\Response');
+        $response->headers = $this->createParameterBagMock();
+
+        return $response;
     }
+    
 /*
     protected function createRequestMock(
         $attributes = null, $query = null, $formatter = null,

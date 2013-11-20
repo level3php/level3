@@ -12,7 +12,7 @@ trait Sort
             $sort = $this->extractSortFromHeader();
         }
         
-        $this->attributes->set('sort', $sort);
+        $this->attributes->set('_sort', $sort);
     }
 
     private function extractSortFromParameters()

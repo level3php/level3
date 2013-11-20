@@ -51,7 +51,7 @@ class Processor
 
     protected function expandLinkedResources(Request $request, Resource $resource)
     {
-        $paths = $request->attributes->get('expand');
+        $paths = $request->attributes->get('_expand');
         if (!$paths) {
             return;
         }

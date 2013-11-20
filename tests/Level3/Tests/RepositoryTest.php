@@ -82,8 +82,8 @@ class RepositoryTestMock
 {
     public function delete(ParameterBag $attributes) {}
     public function get(ParameterBag $attributes) {}
-    public function post(ParameterBag $attributes, Array $data) {}
-    public function put(ParameterBag $attributes, Array $data) {}
-    public function patch(ParameterBag $attributes, Array $data) {}
+    public function post(ParameterBag $attributes, ParameterBag $data) {}
+    public function put(ParameterBag $attributes, ParameterBag $data) {}
+    public function patch(ParameterBag $attributes, ParameterBag $data) {}
     public function find(ParameterBag $attributes, ParameterBag $filters) {}
 }

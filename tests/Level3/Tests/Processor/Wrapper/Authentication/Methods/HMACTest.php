@@ -20,7 +20,7 @@ class HMACTest extends TestCase
         $method = new HMACMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::VALID_TOKEN_SHA256);
 
@@ -43,7 +43,7 @@ class HMACTest extends TestCase
         $method->setHashAlgorithm('md5');
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::VALID_TOKEN_MD5);
 
@@ -77,7 +77,7 @@ class HMACTest extends TestCase
         $method = new HMACMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::MALFORMED_TOKEN);
 
@@ -92,7 +92,7 @@ class HMACTest extends TestCase
         $method = new HMACMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::INVALID_TOKEN);
 

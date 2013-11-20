@@ -6,5 +6,5 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface Finder
 {
-    public function find(ParameterBag $attributes, ParameterBag $filters);
+    public function find(ParameterBag $attributes, ParameterBag $query);
 }

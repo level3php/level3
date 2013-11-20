@@ -54,7 +54,7 @@ abstract class Basic extends HeaderBased
             return null;
         }
 
-        $response->setHeader(
+        $response->headers->set(
             self::WWW_AUTHENTICATE_HEADER,
             sprintf('%s realm="%s"', $this->scheme, $this->realm)
         );

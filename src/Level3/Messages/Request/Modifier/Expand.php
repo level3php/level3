@@ -12,7 +12,7 @@ trait Expand
             $expand = $this->extractExpandFromHeader();
         }
         
-        $this->attributes->set('expand', $expand);
+        $this->attributes->set('_expand', $expand);
     }
 
     private function extractExpandFromParameters()

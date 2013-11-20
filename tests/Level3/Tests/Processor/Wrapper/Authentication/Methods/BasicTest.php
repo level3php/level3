@@ -19,7 +19,7 @@ class BasicTest extends TestCase
         $method = new BasicMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(Basic::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic '. self::VALID_TOKEN);
 
@@ -41,7 +41,7 @@ class BasicTest extends TestCase
         $response->shouldReceive('getStatusCode')
             ->once()->andReturn(StatusCode::UNAUTHORIZED);
 
-       $response->shouldReceive('setHeader')
+        $response->headers->shouldReceive('set')
             ->once()->with(Basic::WWW_AUTHENTICATE_HEADER, 'Basic realm="test"')
             ->andReturn(StatusCode::UNAUTHORIZED);
 
@@ -68,7 +68,7 @@ class BasicTest extends TestCase
         $method = new BasicMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(Basic::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic '. self::MALFORMED_TOKEN);
 
@@ -83,7 +83,7 @@ class BasicTest extends TestCase
         $method = new BasicMock();
 
         $request = $this->createRequestMockSimple();
-        $request->shouldReceive('getHeader')
+        $request->headers->shouldReceive('get')
             ->with(Basic::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic '. self::INVALID_TOKEN);
 
