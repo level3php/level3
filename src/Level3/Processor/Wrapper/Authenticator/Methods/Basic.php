@@ -43,7 +43,7 @@ abstract class Basic extends HeaderBased
     protected function modifyRequest(Request $request, $httpMethod)
     {
         $credentials = new Credentials($this->lastVerification);
-        $request->setCredentials($credentials);
+        $request->attributes->set('_credentials', $credentials);
 
         $this->lastVerification = null;
     }

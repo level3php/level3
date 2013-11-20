@@ -124,7 +124,7 @@ class ProcessorTest extends TestCase
         }
 
         $attributes
-            ->shouldReceive('get')->with('expand')->once()
+            ->shouldReceive('get')->with('_expand')->once()
             ->andReturn($expand);
 
         if ($expand) {

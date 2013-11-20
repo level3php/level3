@@ -234,27 +234,23 @@ class CrossOriginResourceSharingTest extends TestCase
         $wrapper->setAllowCredentials($invalidAllow);
     }
 
-    public function NONOtestSetAllowMethods()
+    public function testSetAllowMethods()
     {
         $methods = ['bar', 'foo'];
 
         $wrapper = $this->createWrapper();
         $wrapper->setAllowMethods(true);
 
-        $hub = $this->createHubMock();
-        $hub->shouldReceive('setLevel3');
-
-        $mapper = $this->createMapperMock();
-        $mapper->shouldReceive('getMethods')
-            ->once()
-            ->with($repository)
-            ->andReturn($methods);
-
         $repository = $this->createRepositoryMock();
-        $processor = $this->createProcessorMock();
-        $processor->shouldReceive('setLevel3');
 
-        $level3 = new Level3($mapper, $hub, $processor);
+        $mapper = $this->getMock('Level3\Mapper');
+        $mapper->expects($this->once())
+            ->method('getMethods')
+            ->will($this->returnValue($methods));
+
+
+        $level3 = $this->createLevel3Mock();
+        $level3->shouldReceive('getMapper')->once()->andReturn($mapper);
 
 
         $this->assertSame(true, $wrapper->getAllowMethods());

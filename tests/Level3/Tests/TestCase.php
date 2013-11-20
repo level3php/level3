@@ -114,6 +114,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     {
         $request = m::mock('Level3\Messages\Request');
         $request->headers = $this->createParameterBagMock();
+        $request->attributes = $this->createParameterBagMock();
 
         return $request;
     }
@@ -126,32 +127,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
         return $response;
     }
     
-/*
-    protected function createRequestMock(
-        $attributes = null, $query = null, $formatter = null,
-        $repository = null, $request = null, $key = self::IRRELEVANT_KEY
-    ) {
-        $request = $this->createRequestMockSimple();
-        if ($key) {
-            $request->shouldReceive('getKey')
-                ->withNoArgs()->once()->andReturn($key);
-        }
-
-        if ($attributes) {
-            $request->attributes = $attributes;
-        }
-
-        if ($query) {
-            $request->query = $query;
-        }
-
-        if ($request) {
-            $request->request = $request;
-        }
-
-        return $request;
-    }
-*/
     protected function createRequestMock() {
         $request = $this->createRequestMockSimple();
         

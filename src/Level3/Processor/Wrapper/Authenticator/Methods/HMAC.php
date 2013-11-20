@@ -31,7 +31,7 @@ abstract class HMAC extends HeaderBased
         list($apiKey, $signature) = $this->extractApiKeyAndSignature($token);
 
         $privateKey = $this->getPrivateKey($apiKey);
-        $content = $request->getRawContent();
+        $content = $request->getContent();
 
         $calculatedSignature = hash_hmac($this->hashAlgorithm, $content, $privateKey);
 
@@ -57,7 +57,7 @@ abstract class HMAC extends HeaderBased
     protected function modifyRequest(Request $request, $httpMethod)
     {
         $credentials = new Credentials($this->lastVerification);
-        $request->setCredentials($credentials);
+        $request->attributes->set('_credentials', $credentials);
 
         $this->lastVerification = null;
     }

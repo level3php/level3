@@ -24,13 +24,13 @@ class HMACTest extends TestCase
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::VALID_TOKEN_SHA256);
 
-        $request->shouldReceive('getRawContent')
+        $request->shouldReceive('getContent')
             ->withNoArgs()
             ->once()->andReturn('qux');
 
-        $request->shouldReceive('setCredentials')
+        $request->attributes->shouldReceive('set')
             ->once()
-            ->with(m::on(function($credentials) {
+            ->with('_credentials', m::on(function($credentials) {
                 return $credentials->isAuthenticated();
             }));
 
@@ -47,13 +47,13 @@ class HMACTest extends TestCase
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::VALID_TOKEN_MD5);
 
-        $request->shouldReceive('getRawContent')
+        $request->shouldReceive('getContent')
             ->withNoArgs()
             ->once()->andReturn('qux');
 
-        $request->shouldReceive('setCredentials')
+        $request->attributes->shouldReceive('set')
             ->once()
-            ->with(m::on(function($credentials) {
+            ->with('_credentials', m::on(function($credentials) {
                 return $credentials->isAuthenticated();
             }));
 
@@ -96,7 +96,7 @@ class HMACTest extends TestCase
             ->with(HMAC::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: HMAC '. self::INVALID_TOKEN);
 
-        $request->shouldReceive('getRawContent')
+        $request->shouldReceive('getContent')
             ->withNoArgs()
             ->once()->andReturn('qux');
 

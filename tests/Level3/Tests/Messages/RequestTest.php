@@ -10,7 +10,7 @@ class RequestTest extends TestCase
     const IRRELEVANT_KEY = 'X';
     const IRRELEVANT_ID = 'XX';
     const IRRELEVANT_JSON_CONTENT = '{"foo":"bar"}';
-    const IRRELEVANT_XML_CONTENT = '<xml><foo>bar</foo></xml>';
+    const IRRELEVANT_XML_CONTENT = '<xml><foo><qux>bar</qux></foo></xml>';
 
     private $dummySymfonyRequest;
     private $request;
@@ -37,7 +37,7 @@ class RequestTest extends TestCase
             self::IRRELEVANT_XML_CONTENT
         );
 
-        $this->assertSame(['foo' => 'bar'], $request->request->all());
+        $this->assertSame(['foo' => ['qux' => 'bar']], $request->request->all());
     }
 
     /**
@@ -66,8 +66,8 @@ class RequestTest extends TestCase
     {
         $request = Request::create('http://example.com/', 'GET');
 
-        $this->assertNull($request->attributes->get('offset'));
-        $this->assertNull($request->attributes->get('limit'));
+        $this->assertNull($request->attributes->get('_offset'));
+        $this->assertNull($request->attributes->get('_limit'));
     }
 
     public function testInitializeRangeHeader()
@@ -76,8 +76,29 @@ class RequestTest extends TestCase
             'HTTP_Range' => 'entity=10-30'
         ]);
 
-        $this->assertSame(10, $request->attributes->get('offset'));
-        $this->assertSame(20, $request->attributes->get('limit'));
+        $this->assertSame(10, $request->attributes->get('_offset'));
+        $this->assertSame(20, $request->attributes->get('_limit'));
+    }
+
+    public function testInitializeRangeHeaderNegative()
+    {
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_Range' => 'entity=40-30'
+        ]);
+
+        $this->assertNull($request->attributes->get('_offset'));
+        $this->assertNull($request->attributes->get('_limit'));
+    }
+
+
+    public function testInitializeRangeHeaderOpen()
+    {
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_Range' => 'entity=10-'
+        ]);
+
+        $this->assertNull($request->attributes->get('_offset'));
+        $this->assertNull($request->attributes->get('_limit'));
     }
 
     public function testInitializeRangeParam()
@@ -87,8 +108,8 @@ class RequestTest extends TestCase
             '_offset' => 40
         ]);
 
-        $this->assertSame(40, $request->attributes->get('offset'));
-        $this->assertSame(10, $request->attributes->get('limit'));
+        $this->assertSame(40, $request->attributes->get('_offset'));
+        $this->assertSame(10, $request->attributes->get('_limit'));
     }
 
     public function testInitializeRangeConflict()
@@ -100,15 +121,15 @@ class RequestTest extends TestCase
             'HTTP_Range' => 'entity=10-30'
         ]);
 
-        $this->assertSame(40, $request->attributes->get('offset'));
-        $this->assertSame(10, $request->attributes->get('limit'));
+        $this->assertSame(40, $request->attributes->get('_offset'));
+        $this->assertSame(10, $request->attributes->get('_limit'));
     }
 
     public function testInitializeSort()
     {
         $request = Request::create('http://example.com/', 'GET');
 
-        $this->assertNull($request->attributes->get('sort'));
+        $this->assertNull($request->attributes->get('_sort'));
     }
 
     public function testInitializeSortHeader()
@@ -121,7 +142,7 @@ class RequestTest extends TestCase
             'foo' => 1,
             'bar' => 1,
             'baz' => -1
-        ], $request->attributes->get('sort'));
+        ], $request->attributes->get('_sort'));
     }
 
     public function testInitializeSortParam()
@@ -133,7 +154,7 @@ class RequestTest extends TestCase
         $this->assertSame([
             'foo' => 1,
             'bar' => -1
-        ], $request->attributes->get('sort'));
+        ], $request->attributes->get('_sort'));
     }
 
     public function testInitializeSortConflict()
@@ -147,14 +168,26 @@ class RequestTest extends TestCase
         $this->assertSame([
             'foo' => 1,
             'bar' => -1
-        ], $request->attributes->get('sort'));
+        ], $request->attributes->get('_sort'));
+    }
+
+    public function testInitializeSortConflictMissingField()
+    {
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_X-Sort' => ' foo = 1; bar;  =-1'
+        ]);
+
+        $this->assertSame([
+            'foo' => 1,
+            'bar' => 1
+        ], $request->attributes->get('_sort'));
     }
 
     public function testInitializeExpand()
     {
         $request = Request::create('http://example.com/', 'GET');
 
-        $this->assertNull($request->attributes->get('expand'));
+        $this->assertNull($request->attributes->get('_expand'));
     }
 
     public function testInitializeExpandHeader()
@@ -166,7 +199,7 @@ class RequestTest extends TestCase
         $this->assertSame([
             ['foo'],
             ['qux','bar']
-        ], $request->attributes->get('expand'));
+        ], $request->attributes->get('_expand'));
     }
 
     public function testInitializeExpandParam()
@@ -178,7 +211,7 @@ class RequestTest extends TestCase
         $this->assertSame([
             ['foo'],
             ['qux','bar']
-        ], $request->attributes->get('expand'));
+        ], $request->attributes->get('_expand'));
     }
 
     public function testInitializeExpandConflict()
@@ -192,6 +225,6 @@ class RequestTest extends TestCase
         $this->assertSame([
             ['foo'],
             ['qux','bar']
-        ], $request->attributes->get('expand'));
+        ], $request->attributes->get('_expand'));
     }
 }

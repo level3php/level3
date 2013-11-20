@@ -23,9 +23,9 @@ class BasicTest extends TestCase
             ->with(Basic::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic '. self::VALID_TOKEN);
 
-        $request->shouldReceive('setCredentials')
+        $request->attributes->shouldReceive('set')
             ->once()
-            ->with(m::on(function($credentials) {
+            ->with('_credentials', m::on(function($credentials) {
                 return $credentials->isAuthenticated();
             }));
 
