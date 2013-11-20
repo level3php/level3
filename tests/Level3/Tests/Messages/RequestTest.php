@@ -77,7 +77,17 @@ class RequestTest extends TestCase
         ]);
 
         $this->assertSame(10, $request->attributes->get('_offset'));
-        $this->assertSame(20, $request->attributes->get('_limit'));
+        $this->assertSame(21, $request->attributes->get('_limit'));
+    }
+
+    public function testInitializeRangeHeaderExactRecord()
+    {
+        $request = Request::create('http://example.com/', 'GET', [], [], [], [
+            'HTTP_Range' => 'entity=30-30'
+        ]);
+
+        $this->assertSame(30, $request->attributes->get('_offset'));
+        $this->assertSame(1, $request->attributes->get('_limit'));
     }
 
     public function testInitializeRangeHeaderNegative()
