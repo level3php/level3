@@ -45,7 +45,7 @@ trait Range
             return null;
         }
 
-        $limit = (int) $matches['end'] - (int) $matches['start'];
+        $limit = (int) $matches['end'] - (int) $matches['start'] + 1;
         if ($limit <= 0) {
             return null;
         }
