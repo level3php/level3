@@ -15,6 +15,12 @@ class Request extends BaseRequest
     use Modifier\Sort;
     use Modifier\Expand;
 
+    protected static function initializeFormats()
+    {
+        parent::initializeFormats();
+        static::$formats['txt'][] = 'application/x-www-form-urlencoded';
+    }
+
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
         parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
@@ -27,16 +33,24 @@ class Request extends BaseRequest
 
     protected function formatContent()
     {
-        if (!$this->content) {
+        if (!$this->getContent()) {
             return;
         }
 
-        switch ($this->getRequestFormat()) {
+        $format = $this->getRequestFormat(null);
+        if (!$format) {
+            $format = $this->getContentType();
+        }
+
+        switch ($format) {
             case 'json':
                 $request = $this->getJSONContentAsArray();
                 break;
             case 'xml':
                 $request = $this->getXMLContentAsArray();
+                break;
+            case 'txt':
+                $request = $this->getURLEncodedContentAsArray();
                 break;
             default:
                 $request = null;
@@ -64,6 +78,14 @@ class Request extends BaseRequest
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    private function getURLEncodedContentAsArray()
+    {
+        $data = [];
+        parse_str($this->getContent(), $data);
+
+        return $data;
     }
 
     private function xmlToArray(SimpleXMLElement $xml)

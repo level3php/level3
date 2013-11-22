@@ -9,6 +9,7 @@ class RequestTest extends TestCase
 {
     const IRRELEVANT_KEY = 'X';
     const IRRELEVANT_ID = 'XX';
+    const IRRELEVANT_URLENCODED_CONTENT = 'foo=bar';
     const IRRELEVANT_JSON_CONTENT = '{"foo":"bar"}';
     const IRRELEVANT_XML_CONTENT = '<xml><foo><qux>bar</qux></foo></xml>';
 
@@ -18,6 +19,30 @@ class RequestTest extends TestCase
     public function setUp()
     {
         $this->request = new Request();
+    }
+
+    public function testFormatContentDefault()
+    {
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', [], [], [], [
+                
+            ],
+            self::IRRELEVANT_URLENCODED_CONTENT
+        );
+
+        $this->assertSame(['foo' => 'bar'], $request->request->all());
+    }
+
+    public function testFormatContentContentType()
+    {
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', [], [], [], [
+                'CONTENT_TYPE' => 'application/json'
+            ],
+            self::IRRELEVANT_JSON_CONTENT
+        );
+
+        $this->assertSame(['foo' => 'bar'], $request->request->all());
     }
 
     public function testFormatContentJSON()
