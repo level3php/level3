@@ -3,6 +3,7 @@
 namespace Level3\Tests;
 
 use Level3\Level3;
+use Mockery as m;
 
 class Level3Test extends TestCase
 {
@@ -141,6 +142,34 @@ class Level3Test extends TestCase
 
         $this->level3->addFormatter($formatter);
         $this->assertSame(['foo/bar' => $formatter], $this->level3->getFormatters());
+    }
+
+    public function testGetFormatterByContentTypeDefault()
+    {
+        $formatterA = m::mock('Level3\Resource\Formatter');
+        $formatterA->shouldReceive('getContentType')->andReturn('bar/bar');
+        $this->level3->addFormatter($formatterA);
+
+        $formatterB = m::mock('Level3\Resource\Formatter');     
+        $formatterB->shouldReceive('getContentType')->andReturn('foo/foo');
+        $this->level3->addFormatter($formatterB);
+
+        $this->assertSame($formatterA, $this->level3->getFormatterByContentType('*/*'));
+    }
+
+    public function testGetFormatterByContentTypeSetDefault()
+    {
+        $formatterA = m::mock('Level3\Resource\Formatter');
+        $formatterA->shouldReceive('getContentType')->andReturn('bar/bar');
+        $this->level3->addFormatter($formatterA);
+
+        $formatterB = m::mock('Level3\Resource\Formatter');     
+        $formatterB->shouldReceive('getContentType')->andReturn('foo/foo');
+        $this->level3->addFormatter($formatterB);
+
+        $this->level3->setDefaultFormatter('foo/foo');
+
+        $this->assertSame($formatterB, $this->level3->getFormatterByContentType('*/*'));
     }
 
     public function testGetFormatterByContentType()

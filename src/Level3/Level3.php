@@ -12,12 +12,15 @@ class Level3
     const PRIORITY_NORMAL = 20;
     const PRIORITY_HIGH = 30;
 
+    const CONTENT_TYPE_WILDCARD = '*/*';
+
     private $debug;
     private $hub;
     private $mapper;
     private $processor;
     private $wrappers = [];
     private $formatters = [];
+    private $defaultContentType;
 
     public function __construct(Mapper $mapper, Hub $hub, Processor $processor)
     {
@@ -99,6 +102,9 @@ class Level3
     public function addFormatter(Formatter $formatter)
     {
         $contentType = $formatter->getContentType();
+        if (!$this->defaultContentType) {
+            $this->defaultContentType = $contentType;
+        }
 
         $this->formatters[$contentType] = $formatter;
     }
@@ -110,11 +116,20 @@ class Level3
 
     public function getFormatterByContentType($contentType)
     {
+        if ($contentType == self::CONTENT_TYPE_WILDCARD) {
+            $contentType = $this->defaultContentType;
+        }
+
         if (!isset($this->formatters[$contentType])) {
             return null;
         }
 
         return $this->formatters[$contentType];
+    }
+
+    public function setDefaultFormatter($contentType)
+    {
+        $this->defaultContentType = $contentType;
     }
 
     public function boot()
