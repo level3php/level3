@@ -168,7 +168,13 @@ class Processor
     protected function covertExceptionToResponse(Exception $exception, Request $request)
     {
         $response = ExceptionResponse::createFromException($exception);
-        $this->calculateAndSetFormatter($response, $request);
+        $response->setDebug(true);
+        
+        if (!in_array($response->getStatusCode(), [
+            StatusCode::NO_CONTENT, StatusCode::NOT_ACCEPTABLE
+        ])) {
+            $this->calculateAndSetFormatter($response, $request);
+        }
 
         return $response;
     }
