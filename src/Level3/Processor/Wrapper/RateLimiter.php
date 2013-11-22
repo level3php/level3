@@ -64,9 +64,9 @@ class RateLimiter extends Wrapper
 
     protected function addHeadersToResponse(Response $response, $remaining, $reset)
     {
-        $response->addHeader(self::HEADER_LIMIT, $this->limit);
-        $response->addHeader(self::HEADER_REMAINING, $remaining);
-        $response->addHeader(self::HEADER_RESET, $reset);
+        $response->headers->set(self::HEADER_LIMIT, $this->limit);
+        $response->headers->set(self::HEADER_REMAINING, $remaining);
+        $response->headers->set(self::HEADER_RESET, $reset);
     }
 
     protected function getKey(Request $request)

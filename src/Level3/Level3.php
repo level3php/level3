@@ -2,8 +2,9 @@
 
 namespace Level3;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Level3\Processor\Wrapper;
+use Level3\Resource\Formatter;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Level3
 {
@@ -16,6 +17,7 @@ class Level3
     private $mapper;
     private $processor;
     private $wrappers = [];
+    private $formatters = [];
 
     public function __construct(Mapper $mapper, Hub $hub, Processor $processor)
     {
@@ -92,6 +94,27 @@ class Level3
                 return $wrapper;
             }
         }
+    }
+
+    public function addFormatter(Formatter $formatter)
+    {
+        $contentType = $formatter->getContentType();
+
+        $this->formatters[$contentType] = $formatter;
+    }
+
+    public function getFormatters()
+    {
+        return $this->formatters;
+    }
+
+    public function getFormatterByContentType($contentType)
+    {
+        if (!isset($this->formatters[$contentType])) {
+            return null;
+        }
+
+        return $this->formatters[$contentType];
     }
 
     public function boot()

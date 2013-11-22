@@ -2,13 +2,13 @@
 
 namespace Level3;
 
-
+use Level3\Messages\Request;
 use Level3\Resource\Resource;
+use Level3\Messages\Response;
+use Level3\Messages\ExceptionResponse;
 use Level3\Exceptions\NotFound;
 use Level3\Exceptions\NotImplemented;
-use Level3\Messages\Response;
-use Level3\Messages\Request;
-
+use Level3\Exceptions\NotAcceptable;
 use Teapot\StatusCode;
 use RuntimeException;
 use Exception;
@@ -32,7 +32,7 @@ class Processor
             $resource = $repository->find($request->attributes, $request->query);
             $this->expandLinkedResources($request, $resource);
 
-            return Response::createFromResource($request, $resource);
+            return $this->covertResourceToResponse($resource, $request);
         });
     }
 
@@ -45,7 +45,7 @@ class Processor
             $resource = $repository->get($request->attributes);
             $this->expandLinkedResources($request, $resource);
 
-            return Response::createFromResource($request, $resource);
+            return $this->covertResourceToResponse($resource, $request);
         });
     }
 
@@ -69,7 +69,7 @@ class Processor
         ) {
             $resource = $repository->post($request->attributes, $request->request);
 
-            $response = Response::createFromResource($request, $resource);
+            $response = $this->covertResourceToResponse($resource, $request);
             $response->setStatusCode(StatusCode::CREATED);
 
             return $response;
@@ -84,7 +84,7 @@ class Processor
         ) {
             $resource = $repository->patch($request->attributes, $request->request);
 
-            return Response::createFromResource($request, $resource);
+            return $this->covertResourceToResponse($resource, $request);
         });
     }
 
@@ -96,7 +96,7 @@ class Processor
         ) {
             $resource = $repository->put($request->attributes, $request->request);
 
-            return Response::createFromResource($request, $resource);
+            return $this->covertResourceToResponse($resource, $request);
         });
     }
 
@@ -125,7 +125,7 @@ class Processor
             Repository $repository, 
             Request $request
         ) use ($exception) {
-            return Response::createFromException($request, $exception);
+            return $this->covertExceptionToResponse($exception, $request);
         });
     }
 
@@ -156,4 +156,40 @@ class Processor
             throw new NotFound();
         }
     }
+
+    protected function covertResourceToResponse(Resource $resource, Request $request)
+    {
+        $response = Response::createFromResource($resource);
+        $this->calculateAndSetFormatter($response, $request);
+
+        return $response;
+    }
+
+    protected function covertExceptionToResponse(Exception $exception, Request $request)
+    {
+        $response = ExceptionResponse::createFromException($exception);
+        $this->calculateAndSetFormatter($response, $request);
+
+        return $response;
+    }
+
+    protected function calculateAndSetFormatter(Response $response, Request $request)
+    {
+        $formatter = null;
+
+        $contentTypes = $request->getAcceptableContentTypes();
+        foreach ($contentTypes as $contentType) {
+            $formatter = $this->level3->getFormatterByContentType($contentType);
+            if ($formatter) {
+                break;
+            }
+        }
+
+        if (!$formatter) {
+            throw new NotAcceptable();
+        }
+
+        $response->setFormatter($formatter);
+    }
+
 }

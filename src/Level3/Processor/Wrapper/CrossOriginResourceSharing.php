@@ -183,7 +183,7 @@ class CrossOriginResourceSharing extends Wrapper
             return;
         }
 
-        $header = $request->getHeader(self::HEADER_ORIGIN);
+        $header = $request->headers->get(self::HEADER_ORIGIN);
         if ($header && in_array($header, (array) $this->allowOrigin)) {
             return;
         }
@@ -219,7 +219,7 @@ class CrossOriginResourceSharing extends Wrapper
         }
 
         foreach ((array) $this->allowOrigin as $origin) {
-            $response->addHeader(self::HEADER_ALLOW_ORIGIN, $origin);
+            $response->headers->set(self::HEADER_ALLOW_ORIGIN, $origin, false);
         }
     }
 
@@ -244,7 +244,7 @@ class CrossOriginResourceSharing extends Wrapper
         });
 
         $header = implode(', ', $exposeHeaders);
-        $response->addHeader(self::HEADER_EXPOSE_HEADERS, $header);
+        $response->headers->set(self::HEADER_EXPOSE_HEADERS, $header);
     }
 
     protected function getNonSimpleResponseHeaders(Response $response)
@@ -278,7 +278,7 @@ class CrossOriginResourceSharing extends Wrapper
             return;
         }
 
-        $response->addHeader(self::HEADER_MAX_AGE, $this->maxAge);
+        $response->headers->set(self::HEADER_MAX_AGE, $this->maxAge);
     }
 
     protected function applyAllowCredentials(Request $request, Response $response, $method)
@@ -296,7 +296,7 @@ class CrossOriginResourceSharing extends Wrapper
             $header = 'true';
         }
 
-        $response->addHeader(self::HEADER_ALLOW_CRENDENTIALS, $header);
+        $response->headers->set(self::HEADER_ALLOW_CRENDENTIALS, $header);
     }
 
     protected function applyAllowMethods(Repository $repository, Request $request, Response $response, $method)
@@ -312,7 +312,7 @@ class CrossOriginResourceSharing extends Wrapper
         $methods = $this->getLevel3()->getMapper()->getMethods($repository);
 
         $header = implode(', ', $methods);
-        $response->addHeader(self::HEADER_ALLOW_METHODS, $header);
+        $response->headers->set(self::HEADER_ALLOW_METHODS, $header);
     }
 
     protected function applyAllowHeaders(Request $request, Response $response, $method)
@@ -326,7 +326,7 @@ class CrossOriginResourceSharing extends Wrapper
         }
 
         $header = implode(', ', $this->allowHeaders);
-        $response->addHeader(self::HEADER_ALLOW_HEADERS, $header);
+        $response->headers->set(self::HEADER_ALLOW_HEADERS, $header);
     }
 
     protected function isHeaderEnabled($header, $method)

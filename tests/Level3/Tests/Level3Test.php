@@ -134,6 +134,24 @@ class Level3Test extends TestCase
         );
     }
 
+    public function testGetFormatter()
+    {
+        $formatter = $this->createFormatterMock();
+        $this->assertSame([], $this->level3->getFormatters());
+
+        $this->level3->addFormatter($formatter);
+        $this->assertSame(['foo/bar' => $formatter], $this->level3->getFormatters());
+    }
+
+    public function testGetFormatterByContentType()
+    {
+        $formatter = $this->createFormatterMock();
+        $this->assertNull($this->level3->getFormatterByContentType('foo/bar'));
+
+        $this->level3->addFormatter($formatter);
+        $this->assertSame($formatter, $this->level3->getFormatterByContentType('foo/bar'));
+    }
+
     public function testBoot()
     {
         $this->mapperMock->shouldReceive('boot')->with($this->hubMock)->once()->andReturn(null);

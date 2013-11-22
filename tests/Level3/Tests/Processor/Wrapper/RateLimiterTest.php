@@ -48,11 +48,11 @@ class RateLimiterTest extends TestCase
         $this->redisMock->shouldReceive('ttl')->with(self::EXAMPLE_KEY);
 
         $response = $this->callGetInWrapperAndGetResponse('get', $wrapper, $request);
-        $this->assertSame(1000, $response->getHeader(RateLimiter::HEADER_LIMIT));
+        $this->assertSame(1000, $response->headers->get(RateLimiter::HEADER_LIMIT));
 
         $wrapper->setLimit(10);
         $response = $this->callGetInWrapperAndGetResponse('get', $wrapper, $request);
-        $this->assertSame(10, $response->getHeader(RateLimiter::HEADER_LIMIT));
+        $this->assertSame(10, $response->headers->get(RateLimiter::HEADER_LIMIT));
 
     }
 
@@ -73,7 +73,7 @@ class RateLimiterTest extends TestCase
         $this->redisMock->shouldReceive('ttl')->with(self::EXAMPLE_KEY);
 
         $response = $this->callGetInWrapperAndGetResponse('get', $wrapper, $request);
-        $this->assertSame(999, $response->getHeader(RateLimiter::HEADER_REMAINING));
+        $this->assertSame(999, $response->headers->get(RateLimiter::HEADER_REMAINING));
     }
 
     public function testSetResetAfterSecs()
@@ -108,7 +108,7 @@ class RateLimiterTest extends TestCase
         $this->redisMock->shouldReceive('ttl')->with(self::EXAMPLE_KEY)->andReturn(10);
 
         $response = $this->callGetInWrapperAndGetResponse('get', $wrapper, $request);
-        $this->assertSame(time() + 10, $response->getHeader(RateLimiter::HEADER_RESET));
+        $this->assertSame(time() + 10, $response->headers->get(RateLimiter::HEADER_RESET));
     }
 
     /**

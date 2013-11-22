@@ -62,6 +62,37 @@ class ProcessorTest extends TestCase
     }
 
     /**
+     * @expectedException Level3\Exceptions\NotAcceptable
+     */
+    public function testNotMatchingFormatter()
+    {
+        $repository = $this->createRepositoryMock();
+    
+        $this->level3->shouldReceive('getRepository')
+            ->with(self::RELEVANT_KEY)
+            ->once()
+            ->andReturn($repository);
+
+
+        $request = $this->createRequestMockSimple();
+        $request
+            ->shouldReceive('getAcceptableContentTypes')
+            ->withNoArgs()->once()
+            ->andReturn(['foo/bar']);
+
+        $this->level3->shouldReceive('getFormatterByContentType')
+            ->with('foo/bar')->once()
+            ->andReturn(null);
+
+        $request->attributes
+            ->shouldReceive('get');
+
+
+        $repository->shouldReceive('get')->andReturn($this->createResourceMock());
+        $this->processor->get(self::RELEVANT_KEY, $request);
+    }
+
+    /**
      * @dataProvider errorProvider
      */
     public function testError($statusCode, $exception)
@@ -74,6 +105,17 @@ class ProcessorTest extends TestCase
             ->andReturn($repository);
 
         $request = $this->createRequestMockSimple();
+        $request
+            ->shouldReceive('getAcceptableContentTypes')
+            ->withNoArgs()->once()
+            ->andReturn(['foo/bar']);
+
+        $formatter = $this->createFormatterMock();
+        $this->level3->shouldReceive('getFormatterByContentType')
+            ->with('foo/bar')->once()
+            ->andReturn($formatter);
+
+
         $response = $this->processor->error(self::RELEVANT_KEY, $request, $exception);
 
         $this->assertSame($statusCode, $response->getStatusCode());
@@ -108,6 +150,18 @@ class ProcessorTest extends TestCase
         $httpRequest->attributes = $attributes;
         $httpRequest->query = $query;
         $httpRequest->request = $request;
+
+        if ($statusCode != StatusCode::NO_CONTENT) {
+            $httpRequest
+                ->shouldReceive('getAcceptableContentTypes')
+                ->withNoArgs()->once()
+                ->andReturn(['foo/bar']);
+
+            $formatter = $this->createFormatterMock();
+            $this->level3->shouldReceive('getFormatterByContentType')
+                ->with('foo/bar')->once()
+                ->andReturn($formatter);
+        }
  
         if ($query) {
             $repository
