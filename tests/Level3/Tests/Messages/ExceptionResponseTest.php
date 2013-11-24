@@ -1,18 +1,10 @@
 <?php
-/*
- * This file is part of the Level3 package.
- *
- * (c) Máximo Cuadros <maximo@yunait.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace Level3\Tests;
 
 use Level3\Resource\Resource;
 use Level3\Messages\ExceptionResponse;
-use Level3\Resource\Formatter\HAL\JsonFormatter;
+use Level3\Resource\Format\Writer\HAL\JsonWriter;
 use Level3\Exceptions\NotAcceptable;
 
 use Teapot\StatusCode;
@@ -23,7 +15,7 @@ class ExceptionResponseTest extends TestCase
   
     public function testCreateFromException()
     {
-        $formatter = $this->createFormatterMock();
+        $formatter = $this->createFormatWriterMock();
         $request = $this->createRequestMockSimple();
        
 
@@ -43,7 +35,7 @@ class ExceptionResponseTest extends TestCase
 
     public function testCreateFromHTTPException()
     {
-        $formatter = $this->createFormatterMock();
+        $formatter = $this->createFormatWriterMock();
         $request = $this->createRequestMockSimple();
 
         $exception = new NotAcceptable('foo');
@@ -59,7 +51,7 @@ class ExceptionResponseTest extends TestCase
         $this->assertSame('foo', $data['message']);
         $this->assertCount(13, $data['trace']);
 
-        $response->setFormatter(new JsonFormatter);
+        $response->setFormatWriter(new JsonWriter);
 
         $response->setDebug(true);
         $this->assertNotEquals('', $response->getContent());

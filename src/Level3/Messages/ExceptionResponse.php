@@ -74,12 +74,10 @@ class ExceptionResponse extends Response
 
     public function getContent()
     {
-        if (!$this->formatter || !$this->debug) {
+        if (!$this->debug) {
             return '';
         }
 
-        $this->resource->setFormatter($this->formatter);
-
-        return (string) $this->resource;
+        return parent::getContent();
     }
 }

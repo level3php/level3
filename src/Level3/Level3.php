@@ -3,7 +3,7 @@
 namespace Level3;
 
 use Level3\Processor\Wrapper;
-use Level3\Resource\Formatter;
+use Level3\Resource\Format\Writer;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Level3
@@ -19,7 +19,7 @@ class Level3
     private $mapper;
     private $processor;
     private $wrappers = [];
-    private $formatters = [];
+    private $formatWriters = [];
     private $defaultContentType;
 
     public function __construct(Mapper $mapper, Hub $hub, Processor $processor)
@@ -99,35 +99,35 @@ class Level3
         }
     }
 
-    public function addFormatter(Formatter $formatter)
+    public function addFormatWriter(Writer $writer)
     {
-        $contentType = $formatter->getContentType();
+        $contentType = $writer->getContentType();
         if (!$this->defaultContentType) {
             $this->defaultContentType = $contentType;
         }
 
-        $this->formatters[$contentType] = $formatter;
+        $this->formatWriters[$contentType] = $writer;
     }
 
-    public function getFormatters()
+    public function getFormatWriter()
     {
-        return $this->formatters;
+        return $this->formatWriters;
     }
 
-    public function getFormatterByContentType($contentType)
+    public function getFormatWriterByContentType($contentType)
     {
         if ($contentType == self::CONTENT_TYPE_WILDCARD) {
             $contentType = $this->defaultContentType;
         }
 
-        if (!isset($this->formatters[$contentType])) {
+        if (!isset($this->formatWriters[$contentType])) {
             return null;
         }
 
-        return $this->formatters[$contentType];
+        return $this->formatWriters[$contentType];
     }
 
-    public function setDefaultFormatter($contentType)
+    public function setDefaultFormatWriter($contentType)
     {
         $this->defaultContentType = $contentType;
     }

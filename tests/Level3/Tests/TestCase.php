@@ -89,9 +89,9 @@ class TestCase extends \PHPUnit_Framework_TestCase
         return m::mock('Level3\Processor');
     }
 
-    protected function createFormatterMock()
+    protected function createFormatWriterMock()
     {
-        $formatter = m::mock('Level3\Resource\Formatter');
+        $formatter = m::mock('Level3\Resource\Format\Writer');
         $formatter->shouldReceive('getContentType')->andReturn('foo/bar');
 
         return $formatter;

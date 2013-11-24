@@ -12,7 +12,7 @@ namespace Level3\Tests;
 
 use Level3\Resource\Resource;
 use Level3\Messages\Response;
-use Level3\Resource\Formatter\HAL\JsonFormatter;
+use Level3\Resource\Format\Writer\HAL\JsonWriter;
 use Level3\Exceptions\NotAcceptable;
 
 use Teapot\StatusCode;
@@ -73,7 +73,7 @@ class ResponseTest extends TestCase
 
     protected function helperTestCreateFromResource($resource)
     {
-        $formatter = $this->createFormatterMock();
+        $formatter = $this->createFormatWriterMock();
         $request = $this->createRequestMockSimple(false);
 
         $response = Response::createFromResource($resource);
@@ -103,17 +103,17 @@ class ResponseTest extends TestCase
 
     public function testGetContent()
     {
-        $formatter = $this->createFormatterMock();
+        $writer = $this->createFormatWriterMock();
 
         $resource = $this->createResourceMock();
-        $resource->shouldReceive('setFormatter')->with($formatter)->twice()->andReturn();
+        $resource->shouldReceive('setFormatWriter')->with($writer)->twice()->andReturn();
         $resource->shouldReceive('__toString')->with()->twice()->andReturn('Irrelevant Content');
 
         $response = new Response();
         $response->setResource($resource);
         $this->assertSame($response->getContent(), '');
 
-        $response->setFormatter($formatter);
+        $response->setFormatWriter($writer);
         $this->assertSame($response->getContent(), 'Irrelevant Content');
 
         ob_start();
@@ -134,7 +134,7 @@ class ResponseTest extends TestCase
     public function testContentTypeFrom()
     {
         $response = new Response();
-        $response->setFormatter(new JsonFormatter);
+        $response->setFormatWriter(new JsonWriter);
 
         $this->assertEquals('application/hal+json', $response->headers->get('Content-Type'));
     }

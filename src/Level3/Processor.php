@@ -160,7 +160,7 @@ class Processor
     protected function covertResourceToResponse(Resource $resource, Request $request)
     {
         $response = Response::createFromResource($resource);
-        $this->calculateAndSetFormatter($response, $request);
+        $this->calculateAndSetFormatWriter($response, $request);
 
         return $response;
     }
@@ -173,19 +173,19 @@ class Processor
         if (!in_array($response->getStatusCode(), [
             StatusCode::NO_CONTENT, StatusCode::NOT_ACCEPTABLE
         ])) {
-            $this->calculateAndSetFormatter($response, $request);
+            $this->calculateAndSetFormatWriter($response, $request);
         }
 
         return $response;
     }
 
-    protected function calculateAndSetFormatter(Response $response, Request $request)
+    protected function calculateAndSetFormatWriter(Response $response, Request $request)
     {
         $formatter = null;
 
         $contentTypes = $request->getAcceptableContentTypes();
         foreach ($contentTypes as $contentType) {
-            $formatter = $this->level3->getFormatterByContentType($contentType);
+            $formatter = $this->level3->getFormatWriterByContentType($contentType);
             if ($formatter) {
                 break;
             }
@@ -195,7 +195,6 @@ class Processor
             throw new NotAcceptable();
         }
 
-        $response->setFormatter($formatter);
+        $response->setFormatWriter($formatter);
     }
-
 }

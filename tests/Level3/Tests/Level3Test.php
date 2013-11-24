@@ -137,48 +137,48 @@ class Level3Test extends TestCase
 
     public function testGetFormatter()
     {
-        $formatter = $this->createFormatterMock();
-        $this->assertSame([], $this->level3->getFormatters());
+        $formatter = $this->createFormatWriterMock();
+        $this->assertSame([], $this->level3->getFormatWriter());
 
-        $this->level3->addFormatter($formatter);
-        $this->assertSame(['foo/bar' => $formatter], $this->level3->getFormatters());
+        $this->level3->addFormatWriter($formatter);
+        $this->assertSame(['foo/bar' => $formatter], $this->level3->getFormatWriter());
     }
 
     public function testGetFormatterByContentTypeDefault()
     {
-        $formatterA = m::mock('Level3\Resource\Formatter');
+        $formatterA = m::mock('Level3\Resource\Format\Writer');
         $formatterA->shouldReceive('getContentType')->andReturn('bar/bar');
-        $this->level3->addFormatter($formatterA);
+        $this->level3->addFormatWriter($formatterA);
 
-        $formatterB = m::mock('Level3\Resource\Formatter');     
+        $formatterB = m::mock('Level3\Resource\Format\Writer');     
         $formatterB->shouldReceive('getContentType')->andReturn('foo/foo');
-        $this->level3->addFormatter($formatterB);
+        $this->level3->addFormatWriter($formatterB);
 
-        $this->assertSame($formatterA, $this->level3->getFormatterByContentType('*/*'));
+        $this->assertSame($formatterA, $this->level3->getFormatWriterByContentType('*/*'));
     }
 
     public function testGetFormatterByContentTypeSetDefault()
     {
-        $formatterA = m::mock('Level3\Resource\Formatter');
+        $formatterA = m::mock('Level3\Resource\Format\Writer');
         $formatterA->shouldReceive('getContentType')->andReturn('bar/bar');
-        $this->level3->addFormatter($formatterA);
+        $this->level3->addFormatWriter($formatterA);
 
-        $formatterB = m::mock('Level3\Resource\Formatter');     
+        $formatterB = m::mock('Level3\Resource\Format\Writer');     
         $formatterB->shouldReceive('getContentType')->andReturn('foo/foo');
-        $this->level3->addFormatter($formatterB);
+        $this->level3->addFormatWriter($formatterB);
 
-        $this->level3->setDefaultFormatter('foo/foo');
+        $this->level3->setDefaultFormatWriter('foo/foo');
 
-        $this->assertSame($formatterB, $this->level3->getFormatterByContentType('*/*'));
+        $this->assertSame($formatterB, $this->level3->getFormatWriterByContentType('*/*'));
     }
 
     public function testGetFormatterByContentType()
     {
-        $formatter = $this->createFormatterMock();
-        $this->assertNull($this->level3->getFormatterByContentType('foo/bar'));
+        $formatter = $this->createFormatWriterMock();
+        $this->assertNull($this->level3->getFormatWriterByContentType('foo/bar'));
 
-        $this->level3->addFormatter($formatter);
-        $this->assertSame($formatter, $this->level3->getFormatterByContentType('foo/bar'));
+        $this->level3->addFormatWriter($formatter);
+        $this->assertSame($formatter, $this->level3->getFormatWriterByContentType('foo/bar'));
     }
 
     public function testBoot()

@@ -4,7 +4,7 @@ namespace Level3\Messages;
 
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Level3\Resource\Resource;
-use Level3\Resource\Formatter;
+use Level3\Resource\Format\Writer;
 use Teapot\StatusCode;
 use Exception;
 use DateTime;
@@ -13,7 +13,7 @@ use DateInterval;
 class Response extends BaseResponse
 {
     protected $resource;
-    protected $formatter;
+    protected $writer;
 
     public static function createFromResource(Resource $resource)
     {
@@ -72,24 +72,24 @@ class Response extends BaseResponse
         $this->setLastModified($date);
     }
 
-    public function setFormatter(Formatter $formatter)
+    public function setFormatWriter(Writer $writer)
     {
-        $this->formatter = $formatter;
-        $this->setContentTypeFromFormatter($formatter);
+        $this->writer = $writer;
+        $this->setContentTypeFromFormatter($writer);
     }
 
-    protected function setContentTypeFromFormatter(Formatter $formatter)
+    protected function setContentTypeFromFormatter(Writer $writer)
     {
-        $this->headers->set('Content-Type', $formatter->getContentType());
+        $this->headers->set('Content-Type', $writer->getContentType());
     }
 
     public function getContent()
     {
-        if (!$this->formatter) {
+        if (!$this->writer) {
             return '';
         }
 
-        $this->resource->setFormatter($this->formatter);
+        $this->resource->setFormatWriter($this->writer);
 
         return (string) $this->resource;
     }

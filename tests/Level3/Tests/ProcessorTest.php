@@ -80,7 +80,7 @@ class ProcessorTest extends TestCase
             ->withNoArgs()->once()
             ->andReturn(['foo/bar']);
 
-        $this->level3->shouldReceive('getFormatterByContentType')
+        $this->level3->shouldReceive('getFormatWriterByContentType')
             ->with('foo/bar')->once()
             ->andReturn(null);
 
@@ -110,8 +110,8 @@ class ProcessorTest extends TestCase
             ->withNoArgs()->once()
             ->andReturn(['foo/bar']);
 
-        $formatter = $this->createFormatterMock();
-        $this->level3->shouldReceive('getFormatterByContentType')
+        $formatter = $this->createFormatWriterMock();
+        $this->level3->shouldReceive('getFormatWriterByContentType')
             ->with('foo/bar')->once()
             ->andReturn($formatter);
 
@@ -157,8 +157,8 @@ class ProcessorTest extends TestCase
                 ->withNoArgs()->once()
                 ->andReturn(['foo/bar']);
 
-            $formatter = $this->createFormatterMock();
-            $this->level3->shouldReceive('getFormatterByContentType')
+            $formatter = $this->createFormatWriterMock();
+            $this->level3->shouldReceive('getFormatWriterByContentType')
                 ->with('foo/bar')->once()
                 ->andReturn($formatter);
         }
