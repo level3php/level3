@@ -262,4 +262,27 @@ class RequestTest extends TestCase
             ['qux','bar']
         ], $request->attributes->get('_expand'));
     }
+
+    public function testGetAcceptableContentTypes()
+    {
+        $request = Request::create('http://example.com/', 'GET', [
+            '_expand' => 'foo,qux.bar',
+        ], [], [], [
+            'HTTP_ACCEPT' => 'foo/bar'
+        ]);
+
+        $this->assertSame(['foo/bar'], $request->getAcceptableContentTypes());
+    }
+
+
+    public function testGetAcceptableContentTypesEmpty()
+    {
+        $request = Request::create('http://example.com/', 'GET', [
+            '_expand' => 'foo,qux.bar',
+        ], [], [], [
+            'HTTP_ACCEPT' => null
+        ]);
+
+        $this->assertSame(['*/*'], $request->getAcceptableContentTypes());
+    }
 }

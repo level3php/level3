@@ -5,6 +5,7 @@ namespace Level3\Messages;
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
 use Level3\Messages\Request\Modifier;
 use Level3\Exceptions\BadRequest;
+use Level3\Resource\Formatter;
 use Exception;
 
 use SimpleXMLElement;
@@ -98,5 +99,15 @@ class Request extends BaseRequest
         }
 
         return $data;
+    }
+
+    public function getAcceptableContentTypes()
+    {
+        $contentTypes = parent::getAcceptableContentTypes();
+        if (!$contentTypes) {
+            $contentTypes = [Formatter::CONTENT_TYPE_ANY];
+        }
+
+        return $contentTypes;
     }
 }
