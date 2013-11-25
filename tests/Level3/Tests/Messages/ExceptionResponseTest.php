@@ -8,16 +8,14 @@ use Level3\Resource\Format\Writer\HAL\JsonWriter;
 use Level3\Exceptions\NotAcceptable;
 
 use Teapot\StatusCode;
-use Mockery as m;
 
 class ExceptionResponseTest extends TestCase
 {
-  
+
     public function testCreateFromException()
     {
         $formatter = $this->createFormatWriterMock();
         $request = $this->createRequestMockSimple();
-       
 
         $exception = new \Exception('foo');
         $response = ExceptionResponse::createFromException($exception);

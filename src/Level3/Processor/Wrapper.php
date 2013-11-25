@@ -5,7 +5,6 @@ namespace Level3\Processor;
 use Level3\Level3;
 use Level3\Repository;
 use Level3\Messages\Request;
-use Closure;
 
 abstract class Wrapper
 {
@@ -63,7 +62,7 @@ abstract class Wrapper
 
     abstract protected function processRequest(
         Repository $repository = null,
-        Request $request, 
+        Request $request,
         Callable $execution,
         $method
     );

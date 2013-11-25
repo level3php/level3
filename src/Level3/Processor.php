@@ -12,7 +12,6 @@ use Level3\Exceptions\NotAcceptable;
 use Teapot\StatusCode;
 use RuntimeException;
 use Exception;
-use Closure;
 
 class Processor
 {
@@ -26,7 +25,7 @@ class Processor
     public function find($key, Request $request)
     {
         return $this->execute('find', $key, $request, function (
-            Repository $repository, 
+            Repository $repository,
             Request $request
         ) {
             $resource = $repository->find($request->attributes, $request->query);
@@ -39,7 +38,7 @@ class Processor
     public function get($key, Request $request)
     {
         return $this->execute('get', $key, $request, function (
-            Repository $repository, 
+            Repository $repository,
             Request $request
         ) {
             $resource = $repository->get($request->attributes);
@@ -64,7 +63,7 @@ class Processor
     public function post($key, Request $request)
     {
         return $this->execute('post', $key, $request, function (
-            Repository $repository, 
+            Repository $repository,
             Request $request
         ) {
             $resource = $repository->post($request->attributes, $request->request);
@@ -79,7 +78,7 @@ class Processor
     public function patch($key, Request $request)
     {
         return $this->execute('patch', $key, $request, function (
-            Repository $repository, 
+            Repository $repository,
             Request $request
         ) {
             $resource = $repository->patch($request->attributes, $request->request);
@@ -91,7 +90,7 @@ class Processor
     public function put($key, Request $request)
     {
         return $this->execute('put', $key, $request, function (
-            Repository $repository, 
+            Repository $repository,
             Request $request
         ) {
             $resource = $repository->put($request->attributes, $request->request);
@@ -103,7 +102,7 @@ class Processor
     public function delete($key, Request $request)
     {
         return $this->execute('delete', $key, $request, function (
-            Repository $repository, 
+            Repository $repository,
             Request $request
         ) {
             $repository->delete($request->attributes);
@@ -122,7 +121,7 @@ class Processor
     public function error($key, Request $request, Exception $exception)
     {
         return $this->execute('error', $key, $request, function (
-            Repository $repository = null, 
+            Repository $repository = null,
             Request $request
         ) use ($exception) {
             return $this->covertExceptionToResponse($exception, $request);
@@ -176,7 +175,7 @@ class Processor
     {
         $response = ExceptionResponse::createFromException($exception);
         $response->setDebug(true);
-        
+
         if (!in_array($response->getStatusCode(), [
             StatusCode::NO_CONTENT, StatusCode::NOT_ACCEPTABLE
         ])) {

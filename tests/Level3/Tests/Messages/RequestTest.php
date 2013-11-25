@@ -3,7 +3,6 @@
 namespace Level3\Tests;
 
 use Level3\Messages\Request;
-use Mockery as m;
 
 class RequestTest extends TestCase
 {
@@ -25,11 +24,10 @@ class RequestTest extends TestCase
     {
         $request = Request::create(
             'http://example.com/jsonrpc', 'POST', [], [], [], [
-                
+
             ],
             self::IRRELEVANT_URLENCODED_CONTENT
         );
-
 
         $this->assertSame(['foo' => 'bar'], $request->request->all());
     }
@@ -133,7 +131,6 @@ class RequestTest extends TestCase
         $this->assertNull($request->attributes->get('_offset'));
         $this->assertNull($request->attributes->get('_limit'));
     }
-
 
     public function testInitializeRangeHeaderOpen()
     {
@@ -282,7 +279,6 @@ class RequestTest extends TestCase
 
         $this->assertSame(['foo/bar'], $request->getAcceptableContentTypes());
     }
-
 
     public function testGetAcceptableContentTypesEmpty()
     {

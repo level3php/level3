@@ -71,7 +71,7 @@ abstract class HeaderBased implements Method
     }
 
     protected function verifyScheme(Request $request, $scheme)
-    {        
+    {
         return strtolower($this->scheme) == strtolower($scheme);
     }
 

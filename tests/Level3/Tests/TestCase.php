@@ -126,10 +126,11 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
         return $response;
     }
-    
-    protected function createRequestMock() {
+
+    protected function createRequestMock()
+    {
         $request = $this->createRequestMockSimple();
-        
+
         return $request;
     }
 }

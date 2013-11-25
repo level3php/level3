@@ -124,8 +124,8 @@ abstract class Mapper
     }
 
     public function getURI(
-        $repositoryKey, 
-        $interface = self::DEFAULT_INTERFACE, 
+        $repositoryKey,
+        $interface = self::DEFAULT_INTERFACE,
         ParameterBag $attributes = null
     )
     {

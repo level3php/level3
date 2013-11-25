@@ -156,7 +156,7 @@ class CrossOriginResourceSharing extends Wrapper
 
     protected function processRequest(
         Repository $repository = null,
-        Request $request, 
+        Request $request,
         Callable $execution,
         $method
     )
@@ -194,9 +194,9 @@ class CrossOriginResourceSharing extends Wrapper
     }
 
     protected function applyResponseHeaders(
-        Repository $repository = null, 
-        Request $request, 
-        Response $response, 
+        Repository $repository = null,
+        Request $request,
+        Response $response,
         $method
     )
     {

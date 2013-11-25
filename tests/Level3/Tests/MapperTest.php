@@ -197,12 +197,12 @@ class RepositoryMock
     public function put(ParameterBag $attributes, ParameterBag $data)
     {
     }
-    
+
     public function patch(ParameterBag $attributes, ParameterBag $data)
     {
     }
 
     public function find(ParameterBag $attributes, ParameterBag $filters)
-    {   
+    {
     }
 }

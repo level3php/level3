@@ -20,7 +20,7 @@ class ExceptionHandler extends Wrapper
 
     protected function processRequest(
         Repository $repository = null,
-        Request $request, 
+        Request $request,
         Callable $execution,
         $method
     )
@@ -29,8 +29,8 @@ class ExceptionHandler extends Wrapper
             return $execution($repository, $request);
         } catch (Exception $exception) {
             $processor = $this->getLevel3()->getProcessor();
+
             return $processor->error($repository->getKey(), $request, $exception);
         }
     }
 }
-

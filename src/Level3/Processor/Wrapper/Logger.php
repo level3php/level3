@@ -20,7 +20,7 @@ class Logger extends Wrapper
 
     protected function processRequest(
         Repository $repository = null,
-        Request $request, 
+        Request $request,
         Callable $execution,
         $method
     )

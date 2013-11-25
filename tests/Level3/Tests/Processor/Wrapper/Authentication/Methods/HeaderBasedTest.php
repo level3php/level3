@@ -73,7 +73,6 @@ class HeaderBasedTest extends TestCase
             ->with(HeaderBased::AUTHORIZATION_HEADER)
             ->twice()->andReturn('Authorization: Basic bar');
 
-
         $method->authenticateRequest($request, 'get');
     }
 

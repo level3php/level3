@@ -10,7 +10,6 @@ use Level3\Messages\Request;
 use Level3\Messages\Response;
 use Level3\Exceptions\NotFound;
 
-use Closure;
 use RuntimeException;
 
 class ProcessorTest extends TestCase
@@ -67,12 +66,11 @@ class ProcessorTest extends TestCase
     public function testNotMatchingFormatter()
     {
         $repository = $this->createRepositoryMock();
-    
+
         $this->level3->shouldReceive('getRepository')
             ->with(self::RELEVANT_KEY)
             ->once()
             ->andReturn($repository);
-
 
         $request = $this->createRequestMockSimple();
         $request
@@ -87,7 +85,6 @@ class ProcessorTest extends TestCase
         $request->attributes
             ->shouldReceive('get');
 
-
         $repository->shouldReceive('get')->andReturn($this->createResourceMock());
         $this->processor->get(self::RELEVANT_KEY, $request);
     }
@@ -98,7 +95,7 @@ class ProcessorTest extends TestCase
     public function testError($statusCode, $exception)
     {
         $repository = $this->createRepositoryMock();
-    
+
         $this->level3->shouldReceive('getRepository')
             ->with(self::RELEVANT_KEY)
             ->once()
@@ -115,7 +112,6 @@ class ProcessorTest extends TestCase
             ->with('foo/bar')->once()
             ->andReturn($formatter);
 
-
         $response = $this->processor->error(self::RELEVANT_KEY, $request, $exception);
 
         $this->assertSame($statusCode, $response->getStatusCode());
@@ -128,7 +124,7 @@ class ProcessorTest extends TestCase
                 StatusCode::INTERNAL_SERVER_ERROR,
                 new \Exception
             ],
-            [   StatusCode::NOT_FOUND, 
+            [   StatusCode::NOT_FOUND,
                 new NotFound
             ]
         ];
@@ -162,12 +158,12 @@ class ProcessorTest extends TestCase
                 ->with('foo/bar')->once()
                 ->andReturn($formatter);
         }
- 
+
         if ($query) {
             $repository
                 ->shouldReceive($method)->with($attributes, $query)->once()
                 ->andReturn($resource);
-        } else if ($request) {
+        } elseif ($request) {
             $repository
                 ->shouldReceive($method)->with($attributes, $request)->once()
                 ->andReturn($resource);
@@ -186,7 +182,7 @@ class ProcessorTest extends TestCase
                 ->shouldReceive('expandLinkedResourcesTree')->with($expand[0])->once()
                 ->andReturn(null);
         }
-        
+
         $response = $this->processor->$method(self::RELEVANT_KEY, $httpRequest);
 
         $this->assertSame($statusCode, $response->getStatusCode());
@@ -200,80 +196,80 @@ class ProcessorTest extends TestCase
         return [
             [
                 StatusCode::OK,
-                'find', 
+                'find',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 $this->createParameterBagMock(),
                 null,
                 null
             ],
             [
                 StatusCode::OK,
-                'find', 
+                'find',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 $this->createParameterBagMock(),
                 null,
                 [['foo']]
             ],
             [
                 StatusCode::OK,
-                'get', 
+                'get',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 null,
                 null,
                 null
             ],
             [
                 StatusCode::CREATED,
-                'post', 
+                'post',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 null,
                 $this->createParameterBagMock(),
                 null
             ],
             [
                 StatusCode::OK,
-                'patch', 
+                'patch',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 null,
                 $this->createParameterBagMock(),
                 null
             ],
             [
                 StatusCode::OK,
-                'put', 
+                'put',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 null,
                 $this->createParameterBagMock(),
                 null
             ],
             [
                 StatusCode::NO_CONTENT,
-                'delete', 
+                'delete',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 null,
                 null,
                 null
             ],
             [
                 StatusCode::NO_CONTENT,
-                'delete', 
+                'delete',
                 $this->createFinderMock(),
                 $this->createResourceMock(),
-                $this->createParameterBagMock(), 
+                $this->createParameterBagMock(),
                 null,
                 null,
                 null
@@ -291,9 +287,9 @@ class ProcessorTest extends TestCase
 class WrapperMock extends Wrapper
 {
     protected function processRequest(
-        Repository $repository, 
-        Request $request, 
-        Callable $execution, 
+        Repository $repository,
+        Request $request,
+        Callable $execution,
         $method
     )
     {

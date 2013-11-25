@@ -28,8 +28,8 @@ class RateLimiterTest extends TestCase
         $repository = $this->createRepositoryMock();
 
         return $wrapper->$method(
-            $repository, 
-            $request, 
+            $repository,
+            $request,
             function ($repository, $request) use ($response) {
                 return $response;
             }

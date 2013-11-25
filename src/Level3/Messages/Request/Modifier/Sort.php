@@ -2,7 +2,6 @@
 
 namespace Level3\Messages\Request\Modifier;
 
-
 trait Sort
 {
     protected function initializeSort()
@@ -11,7 +10,7 @@ trait Sort
         if (!$sort) {
             $sort = $this->extractSortFromHeader();
         }
-        
+
         $this->attributes->set('_sort', $sort);
     }
 
@@ -21,7 +20,7 @@ trait Sort
             return null;
         }
 
-        $sort = [];        
+        $sort = [];
         $parts = explode(',', $this->query->get('_sort'));
         foreach ($parts as $field) {
             if (substr($field, 0, 1) == '-') {
@@ -32,6 +31,7 @@ trait Sort
         }
 
         $this->query->remove('_sort');
+
         return $sort;
     }
 

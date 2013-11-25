@@ -5,6 +5,7 @@ php:
   - 5.5
 
 before_script:
+  - /bin/bash ./vendor/level3/demo/.travis.sh
   - phpenv rehash
   - composer --no-interaction --prefer-source --dev install
   # webserver behat tests

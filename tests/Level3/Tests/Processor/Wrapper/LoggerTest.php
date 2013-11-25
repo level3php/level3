@@ -36,7 +36,7 @@ class LoggerTest extends TestCase
             ->once()->andReturn('foo');
 
         $expected = $this->wrapper->$method(
-            $repository, $request, 
+            $repository, $request,
             function($repository, $request) use ($response, $code) {
                 return $response;
             }

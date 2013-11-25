@@ -3,7 +3,6 @@ namespace Level3\Tests;
 
 use Level3\Processor\Wrapper\ExceptionHandler;
 use Level3\Exceptions\NotFound;
-use Teapot\StatusCode;
 use Exception;
 
 class ExceptionHandlerTest extends TestCase
@@ -56,7 +55,7 @@ class ExceptionHandlerTest extends TestCase
             ->with('key', $request, $exception);
 
         $expected = $this->wrapper->$method(
-            $repository, $request, 
+            $repository, $request,
             function($repository, $request) use ($exception) {
                 throw $exception;
             }

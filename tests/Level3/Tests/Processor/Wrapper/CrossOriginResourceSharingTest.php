@@ -248,10 +248,8 @@ class CrossOriginResourceSharingTest extends TestCase
             ->method('getMethods')
             ->will($this->returnValue($methods));
 
-
         $level3 = $this->createLevel3Mock();
         $level3->shouldReceive('getMapper')->once()->andReturn($mapper);
-
 
         $this->assertSame(true, $wrapper->getAllowMethods());
         $wrapper->setLevel3($level3);

@@ -2,7 +2,6 @@
 
 namespace Level3\Messages\Request\Modifier;
 
-
 trait Range
 {
     protected function initializeRange()

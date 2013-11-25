@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Level3\Resource\Resource;
 use Level3\Resource\Format\Writer;
 use Teapot\StatusCode;
-use Exception;
 use DateTime;
 use DateInterval;
 
@@ -29,7 +28,7 @@ class Response extends BaseResponse
         $this->configureCacheWithResource($resource);
         $this->configureETagFromResource($resource);
         $this->configureLastModifierFromResource($resource);
-        
+
         $this->resource = $resource;
     }
 

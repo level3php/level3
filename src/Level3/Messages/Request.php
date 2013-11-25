@@ -26,7 +26,7 @@ class Request extends BaseRequest
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
         parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
-        
+
         $this->formatContent();
         $this->initializeRange();
         $this->initializeSort();
@@ -58,7 +58,7 @@ class Request extends BaseRequest
                 $request = null;
                 break;
         }
-   
+
         if (is_array($request)) {
             $this->request->replace($request);
         }

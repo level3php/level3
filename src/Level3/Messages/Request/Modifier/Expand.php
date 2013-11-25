@@ -2,7 +2,6 @@
 
 namespace Level3\Messages\Request\Modifier;
 
-
 trait Expand
 {
     protected function initializeExpand()
@@ -11,7 +10,7 @@ trait Expand
         if (!$expand) {
             $expand = $this->extractExpandFromHeader();
         }
-        
+
         $this->attributes->set('_expand', $expand);
     }
 

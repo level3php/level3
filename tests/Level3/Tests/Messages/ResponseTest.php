@@ -13,7 +13,6 @@ namespace Level3\Tests;
 use Level3\Resource\Resource;
 use Level3\Messages\Response;
 use Level3\Resource\Format\Writer\HAL\JsonWriter;
-use Level3\Exceptions\NotAcceptable;
 
 use Teapot\StatusCode;
 use Mockery as m;
@@ -81,7 +80,6 @@ class ResponseTest extends TestCase
         $this->assertSame(StatusCode::OK, $response->getStatusCode());
         $this->assertSame($resource, $response->getResource());
         //$this->assertSame($formatter, $response->getFormatter());
-
         return $response;
     }
 
@@ -99,7 +97,6 @@ class ResponseTest extends TestCase
         $response->setStatusCode(StatusCode::NOT_FOUND);
         $this->assertSame(StatusCode::NOT_FOUND, $response->getStatusCode());
     }
-
 
     public function testGetContent()
     {
@@ -139,5 +136,4 @@ class ResponseTest extends TestCase
         $this->assertEquals('application/hal+json', $response->headers->get('Content-Type'));
     }
 
-   
 }

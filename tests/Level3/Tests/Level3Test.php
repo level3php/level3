@@ -150,7 +150,7 @@ class Level3Test extends TestCase
         $formatterA->shouldReceive('getContentType')->andReturn('bar/bar');
         $this->level3->addFormatWriter($formatterA);
 
-        $formatterB = m::mock('Level3\Resource\Format\Writer');     
+        $formatterB = m::mock('Level3\Resource\Format\Writer');
         $formatterB->shouldReceive('getContentType')->andReturn('foo/foo');
         $this->level3->addFormatWriter($formatterB);
 
@@ -163,7 +163,7 @@ class Level3Test extends TestCase
         $formatterA->shouldReceive('getContentType')->andReturn('bar/bar');
         $this->level3->addFormatWriter($formatterA);
 
-        $formatterB = m::mock('Level3\Resource\Format\Writer');     
+        $formatterB = m::mock('Level3\Resource\Format\Writer');
         $formatterB->shouldReceive('getContentType')->andReturn('foo/foo');
         $this->level3->addFormatWriter($formatterB);
 
