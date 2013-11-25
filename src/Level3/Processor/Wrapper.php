@@ -56,13 +56,13 @@ abstract class Wrapper
         return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
-    public function error(Repository $repository, Request $request, Callable $execution)
+    public function error(Repository $repository = null, Request $request, Callable $execution)
     {
         return $this->processRequest($repository, $request, $execution, __FUNCTION__);
     }
 
     abstract protected function processRequest(
-        Repository $repository,
+        Repository $repository = null,
         Request $request, 
         Callable $execution,
         $method

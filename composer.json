@@ -15,10 +15,11 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
-        "level3/resource": "dev-master",
+        "psr/log": "~1.0",
         "shrikeh/teapot": "0.2",
         "symfony/http-foundation": "2.3.*@dev",
-        "psr/log": "~1.0"
+        "hampel/json": "1.0.*",
+        "level3/resource": "dev-master"
     },
     "require-dev": {
         "mockery/mockery": "0.8.0",

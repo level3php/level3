@@ -14,4 +14,4 @@ before_script:
 
 script: 
   - phpunit
-  - vendor/bin/behat --config tests/behavior/behat.yml
+  - vendor/bin/behat --config vendor/level3/demo/tests/behavior/behat.yml

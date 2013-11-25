@@ -30,6 +30,7 @@ class RequestTest extends TestCase
             self::IRRELEVANT_URLENCODED_CONTENT
         );
 
+
         $this->assertSame(['foo' => 'bar'], $request->request->all());
     }
 
@@ -68,7 +69,7 @@ class RequestTest extends TestCase
     /**
      * @expectedException Level3\Exceptions\BadRequest
      */
-    public function testFormatContentInvalid()
+    public function testFormatContentInvalidXML()
     {
         $request = Request::create(
             'http://example.com/jsonrpc', 'POST', ['_format' => 'xml'], [], [], [],
@@ -79,6 +80,14 @@ class RequestTest extends TestCase
     /**
      * @expectedException Level3\Exceptions\BadRequest
      */
+    public function testFormatContentInvalidJSON()
+    {
+        $request = Request::create(
+            'http://example.com/jsonrpc', 'POST', ['_format' => 'json'], [], [], [],
+            self::IRRELEVANT_XML_CONTENT
+        );
+    }
+
     public function testFormatContentNonSupportedFormat()
     {
         $request = Request::create(

@@ -39,7 +39,7 @@ class Authenticator extends Wrapper
     }
 
     public function error(
-        Repository $repository, 
+        Repository $repository = null, 
         Request $request, 
         Callable $execution
     )
@@ -53,7 +53,7 @@ class Authenticator extends Wrapper
     }
 
     protected function processRequest(
-        Repository $repository,
+        Repository $repository = null,
         Request $request, 
         Callable $execution,
         $method

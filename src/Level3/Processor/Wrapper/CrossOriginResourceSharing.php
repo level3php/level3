@@ -155,7 +155,7 @@ class CrossOriginResourceSharing extends Wrapper
     }
 
     protected function processRequest(
-        Repository $repository,
+        Repository $repository = null,
         Request $request, 
         Callable $execution,
         $method
@@ -194,18 +194,21 @@ class CrossOriginResourceSharing extends Wrapper
     }
 
     protected function applyResponseHeaders(
-        Repository $repository, 
+        Repository $repository = null, 
         Request $request, 
         Response $response, 
         $method
     )
     {
         $this->applyAllowOriginHeader($request, $response, $method);
-        $this->applyAllowMethods($repository, $request, $response, $method);
         $this->applyAllowHeaders($request, $response, $method);
         $this->applyMaxAge($request, $response, $method);
         $this->applyExposeHeaders($request, $response, $method);
         $this->applyAllowCredentials($request, $response, $method);
+
+        if ($repository) {
+            $this->applyAllowMethods($repository, $request, $response, $method);
+        }
     }
 
     protected function applyAllowOriginHeader(Request $request, Response $response, $method)

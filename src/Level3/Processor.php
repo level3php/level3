@@ -122,7 +122,7 @@ class Processor
     public function error($key, Request $request, Exception $exception)
     {
         return $this->execute('error', $key, $request, function (
-            Repository $repository, 
+            Repository $repository = null, 
             Request $request
         ) use ($exception) {
             return $this->covertExceptionToResponse($exception, $request);
@@ -131,9 +131,10 @@ class Processor
 
     protected function execute($method, $key, Request $request, Callable $execution)
     {
-        $repository = $this->getRepository($key);
+        $repository = $this->getRepository($method, $key);
+
         foreach ($this->getProcessorWrappers() as $wrapper) {
-            $execution = function (Repository $repository, Request $request) use (
+            $execution = function (Repository $repository = null, Request $request) use (
                 $wrapper, $method, $repository, $execution
             ) {
                 return $wrapper->$method($repository, $request, $execution);
@@ -148,13 +149,19 @@ class Processor
         return $this->level3->getProcessorWrappers();
     }
 
-    protected function getRepository($key)
+    protected function getRepository($method, $key)
     {
+        $repository = null;
+
         try {
-            return $this->level3->getRepository($key);
+            $repository = $this->level3->getRepository($key);
         } catch (RuntimeException $e) {
-            throw new NotFound();
+            if ($method != 'error') {
+                throw new NotFound('Unable to find repository');
+            }
         }
+
+        return $repository;
     }
 
     protected function covertResourceToResponse(Resource $resource, Request $request)
