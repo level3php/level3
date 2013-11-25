@@ -7,6 +7,7 @@ use Level3\Resource\Resource;
 use Level3\Messages\Response;
 use Level3\Messages\ExceptionResponse;
 use Level3\Exceptions\NotFound;
+use Level3\Exceptions\BadRequest;
 use Level3\Exceptions\NotImplemented;
 use Level3\Exceptions\NotAcceptable;
 use Teapot\StatusCode;
@@ -66,6 +67,10 @@ class Processor
             Repository $repository,
             Request $request
         ) {
+            if ($request->request->count() == 0) {
+                throw new BadRequest();
+            }
+
             $resource = $repository->post($request->attributes, $request->request);
 
             $response = $this->covertResourceToResponse($resource, $request);
@@ -81,6 +86,10 @@ class Processor
             Repository $repository,
             Request $request
         ) {
+            if ($request->request->count() == 0) {
+                throw new BadRequest();
+            }
+
             $resource = $repository->patch($request->attributes, $request->request);
 
             return $this->covertResourceToResponse($resource, $request);
@@ -93,6 +102,10 @@ class Processor
             Repository $repository,
             Request $request
         ) {
+            if ($request->request->count() == 0) {
+                throw new BadRequest();
+            }
+            
             $resource = $repository->put($request->attributes, $request->request);
 
             return $this->covertResourceToResponse($resource, $request);

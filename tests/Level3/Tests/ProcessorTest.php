@@ -61,6 +61,35 @@ class ProcessorTest extends TestCase
     }
 
     /**
+     * @expectedException Level3\Exceptions\BadRequest
+     * @dataProvider emptyRequest
+     */
+    public function testEmptyRequest($method)
+    {
+        $this->repository = $this->createRepositoryMock();
+
+        $this->level3->shouldReceive('getRepository')
+            ->with(self::RELEVANT_KEY)
+            ->once()
+            ->andReturn($this->repository);
+
+        $request = $this->createRequestMockSimple();
+        $request->request = $this->createParameterBagMock();
+        $request->request->shouldReceive('count')->andReturn(0);
+
+        $this->processor->$method(self::RELEVANT_KEY, $request);
+    }
+
+    public function emptyRequest()
+    {
+        return [
+            ['patch'],
+            ['post'],
+            ['put']
+        ];
+    }
+
+    /**
      * @expectedException Level3\Exceptions\NotAcceptable
      */
     public function testNotMatchingFormatter()
@@ -146,6 +175,9 @@ class ProcessorTest extends TestCase
         $httpRequest->attributes = $attributes;
         $httpRequest->query = $query;
         $httpRequest->request = $request;
+        if ($httpRequest->request) {
+            $httpRequest->request->shouldReceive('count')->andReturn(1);
+        }
 
         if ($statusCode != StatusCode::NO_CONTENT) {
             $httpRequest
