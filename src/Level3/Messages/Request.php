@@ -58,11 +58,9 @@ class Request extends BaseRequest
                 break;
         }
    
-        if (!is_array($request)) {
-            throw new BadRequest();
+        if (is_array($request)) {
+            $this->request->replace($request);
         }
-
-        $this->request->replace($request);
     }
 
     private function getJSONContentAsArray()
@@ -77,7 +75,7 @@ class Request extends BaseRequest
         try {
             return $this->xmlToArray(new SimpleXMLElement($content));
         } catch (Exception $e) {
-            return null;
+            throw new BadRequest();
         }
     }
 
