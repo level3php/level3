@@ -18,12 +18,13 @@
         "level3/resource": "dev-master",
         "shrikeh/teapot": "0.2",
         "symfony/http-foundation": "2.3.*@dev",
-        "psr/log": "~1.0",
-        "sabre/xml": "0.0.5"
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "mockery/mockery": "0.8.0",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.7.*",
+        "level3/demo": "*",
+        "level3/behat": "*"
     },
     "autoload": {
         "psr-0": {

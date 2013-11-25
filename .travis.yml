@@ -6,6 +6,12 @@ php:
 
 before_script:
   - phpenv rehash
-  - composer --dev install
+  - composer --no-interaction --prefer-source --dev install
+  # webserver behat tests
+  - php -S localhost:9091 vendor/level3/demo/web/index.php &
+  - sleep 3
 
-script: phpunit
+
+script: 
+  - phpunit
+  - vendor/bin/behat --config tests/behavior/behat.yml
