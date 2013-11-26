@@ -81,29 +81,33 @@ abstract class Mapper
     {
         $repository = $hub->get($repositoryKey);
 
+        $uris = [];
         foreach (class_implements($repository) as $interface => $method) {
-            $this->mapMethodIfNeeded($repository, $interface);
+            $uri = $this->mapMethodIfNeededAndReturnURIs($repository, $interface);
+            if ($uri) {
+                $uris[$uri] = true;
+            }
         }
 
-        $this->mapOptionsMethod($repository);
+        $this->mapOptionsMethod($repository, array_keys($uris));
     }
 
-    private function mapMethodIfNeeded(Repository $repository, $interface)
+    private function mapMethodIfNeededAndReturnURIs(Repository $repository, $interface)
     {
         if ($repository instanceof $interface) {
-            $this->callToMapMethod($repository, $interface);
+            return $this->callToMapMethod($repository, $interface);
         }
+
+        return null;
     }
 
-    private function mapOptionsMethod(Repository $repository)
+    private function mapOptionsMethod(Repository $repository, Array $uris)
     {
         $repositoryKey = $repository->getKey();
 
-        $curieURIWithOutParams = $this->generateCurieURI($repositoryKey);
-        $this->mapOptions($repositoryKey, $curieURIWithOutParams);
-
-        $curieURIWithParams = $this->generateCurieURI($repositoryKey, true);
-        $this->mapOptions($repositoryKey, $curieURIWithParams);
+        foreach ($uris as $uri) {
+            $this->mapOptions($repositoryKey, $uri);
+        }
     }
 
     private function callToMapMethod(Repository $repository, $interface)
@@ -116,6 +120,8 @@ abstract class Mapper
         $curieURI = $this->getCurieURI($repositoryKey, $interface);
 
         $this->$method($repositoryKey, $curieURI);
+
+        return $curieURI;
     }
 
     public function getURI(
