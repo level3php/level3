@@ -6,6 +6,7 @@ use Closure;
 
 class Hub
 {
+    const INDEX_REPOSITORY_KEY = '_index';
     const MIN_KEY_LENGHT = 1;
 
     private $level3;
@@ -15,6 +16,11 @@ class Hub
     public function setLevel3(Level3 $level3)
     {
         $this->level3 = $level3;
+    }
+
+    public function registerIndexDefinition(Closure $definition)
+    {
+        $this->repositoryDefinitions[self::INDEX_REPOSITORY_KEY] = $definition;
     }
 
     public function registerDefinition($key, Closure $definition)
@@ -76,6 +82,12 @@ class Hub
         if (strlen($key) < self::MIN_KEY_LENGHT) {
             throw new \UnexpectedValueException(
                 sprintf('Invalid resource key "%s", min length %d', $key, self::MIN_KEY_LENGHT)
+            );
+        }
+
+        if ($key == self::INDEX_REPOSITORY_KEY) {
+            throw new \UnexpectedValueException(
+                sprintf('Invalid resource key "%s", is a reserved key', self::INDEX_REPOSITORY_KEY)
             );
         }
 

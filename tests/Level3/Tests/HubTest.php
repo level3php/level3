@@ -15,10 +15,25 @@ class HubTest extends TestCase
         $hub->setLevel3($level3);
     }
 
+    public function testRegisterIndexDefinition()
+    {
+        $repository = m::mock('Level3\Repository');
+        $repository->shouldReceive('setKey')
+            ->with(Hub::INDEX_REPOSITORY_KEY)->once()->andReturn(null);
+
+        $hub = new Hub();
+        $hub->registerIndexDefinition(function () use ($repository) {
+            return $repository;
+        });
+
+        $this->assertSame($repository, $hub->get(Hub::INDEX_REPOSITORY_KEY));
+    }
+
     public function testRegisterDefinition()
     {
         $repository = m::mock('Level3\Repository');
-        $repository->shouldReceive('setKey')->once()->andReturn(['foo']);
+        $repository->shouldReceive('setKey')
+            ->with('foo')->once()->andReturn(null);
 
         $hub = new Hub();
         $hub->registerDefinition('foo', function () use ($repository) {
@@ -26,6 +41,16 @@ class HubTest extends TestCase
         });
 
         $this->assertSame($repository, $hub->get('foo'));
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testRegisterDefinitionReservedKey()
+    {
+        $hub = new Hub();
+        $hub->registerDefinition(Hub::INDEX_REPOSITORY_KEY, function () {
+        });
     }
 
     /**

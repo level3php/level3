@@ -90,6 +90,46 @@ class ProcessorTest extends TestCase
     }
 
     /**
+     * @expectedException LogicException
+     */
+    public function testRepositoryNotReturnResource()
+    {
+        $repository = $this->createRepositoryMock();
+
+        $this->level3->shouldReceive('getRepository')
+            ->with(self::RELEVANT_KEY)
+            ->once()
+            ->andReturn($repository);
+
+        $request = $this->createRequestMockSimple();
+        $request->attributes
+            ->shouldReceive('get');
+
+        $repository->shouldReceive('get')->andReturn(null);
+        $this->processor->get(self::RELEVANT_KEY, $request);
+    }
+
+    /**
+     * @expectedException LogicException
+     */
+    public function testRepositoryReturnObject()
+    {
+        $repository = $this->createRepositoryMock();
+
+        $this->level3->shouldReceive('getRepository')
+            ->with(self::RELEVANT_KEY)
+            ->once()
+            ->andReturn($repository);
+
+        $request = $this->createRequestMockSimple();
+        $request->attributes
+            ->shouldReceive('get');
+
+        $repository->shouldReceive('get')->andReturn(new \stdClass);
+        $this->processor->get(self::RELEVANT_KEY, $request);
+    }
+
+    /**
      * @expectedException Level3\Exceptions\NotAcceptable
      */
     public function testNotMatchingFormatter()

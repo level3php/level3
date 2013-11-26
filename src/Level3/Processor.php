@@ -12,6 +12,7 @@ use Level3\Exceptions\NotImplemented;
 use Level3\Exceptions\NotAcceptable;
 use Teapot\StatusCode;
 use RuntimeException;
+use LogicException;
 use Exception;
 
 class Processor
@@ -30,6 +31,8 @@ class Processor
             Request $request
         ) {
             $resource = $repository->find($request->attributes, $request->query);
+            $this->throwExceptionIfNotResource($resource);
+
             $this->expandLinkedResources($request, $resource);
 
             return $this->covertResourceToResponse($resource, $request);
@@ -43,6 +46,8 @@ class Processor
             Request $request
         ) {
             $resource = $repository->get($request->attributes);
+            $this->throwExceptionIfNotResource($resource);
+
             $this->expandLinkedResources($request, $resource);
 
             return $this->covertResourceToResponse($resource, $request);
@@ -72,6 +77,7 @@ class Processor
             }
 
             $resource = $repository->post($request->attributes, $request->request);
+            $this->throwExceptionIfNotResource($resource);
 
             $response = $this->covertResourceToResponse($resource, $request);
             $response->setStatusCode(StatusCode::CREATED);
@@ -91,6 +97,7 @@ class Processor
             }
 
             $resource = $repository->patch($request->attributes, $request->request);
+            $this->throwExceptionIfNotResource($resource);
 
             return $this->covertResourceToResponse($resource, $request);
         });
@@ -107,6 +114,7 @@ class Processor
             }
             
             $resource = $repository->put($request->attributes, $request->request);
+            $this->throwExceptionIfNotResource($resource);
 
             return $this->covertResourceToResponse($resource, $request);
         });
@@ -215,5 +223,16 @@ class Processor
         }
 
         $response->setFormatWriter($formatter);
+    }
+
+    protected function throwExceptionIfNotResource($resource)
+    {
+        if (!$resource) {
+            throw new LogicException('Expected a valid resource, null given');
+        }
+
+        if (!$resource instanceof Resource) {
+            throw new LogicException('Expected a valid resource');
+        }
     }
 }

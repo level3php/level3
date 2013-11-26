@@ -81,12 +81,7 @@ abstract class Mapper
     {
         $repository = $hub->get($repositoryKey);
 
-        $interfaces = array_merge(
-            $this->interfacesWithOutParams,
-            $this->interfacesWithParams
-        );
-
-        foreach ($interfaces as $interface => $method) {
+        foreach (class_implements($repository) as $interface => $method) {
             $this->mapMethodIfNeeded($repository, $interface);
         }
 
@@ -153,11 +148,29 @@ abstract class Mapper
         }
     }
 
+    public function getHTTPMethodFromInterface($interface)
+    {
+        if (isset($this->interfacesWithOutParams[$interface])) {
+            return $this->interfacesWithOutParams[$interface];
+        }
+
+        if (isset($this->interfacesWithParams[$interface])) {
+            return $this->interfacesWithParams[$interface];
+        }
+
+        return null;
+    }
+
     protected function generateCurieURI($repositoryKey, $specific = false)
     {
         $uri = $this->baseURI;
 
-        $names = explode(self::SLASH_CHARACTER, $repositoryKey);
+        if ($repositoryKey !== Hub::INDEX_REPOSITORY_KEY) {
+            $names = explode(self::SLASH_CHARACTER, $repositoryKey);
+        } else {
+            $names = [''];
+        }
+
         $max = count($names);
         for ($i=0; $i<$max; $i++) {
             $uri .= self::SLASH_CHARACTER . $names[$i];

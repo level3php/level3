@@ -73,6 +73,12 @@ class MapperTest extends TestCase
     public function testGetCurieURI()
     {
         $mapper = $this->getMapperMock();
+
+        $this->assertSame(
+            '/',
+            $mapper->getCurieURI(Hub::INDEX_REPOSITORY_KEY, 'Level3\Repository\Finder')
+        );
+
         $this->assertSame(
             '/foo/{fooId}',
             $mapper->getCurieURI('foo')
@@ -167,6 +173,25 @@ class MapperTest extends TestCase
         $this->assertSame(
             ['DELETE', 'GET', 'PATCH', 'POST', 'PUT'],
             $mapper->getMethods($repository)
+        );
+    }
+
+    public function testGetHTTPMethodFromInterface()
+    {
+        $mapper = $this->getMapperMock();
+        $this->assertSame(
+            'GET',
+            $mapper->getHTTPMethodFromInterface('Level3\Repository\Finder')
+        );
+
+        $this->assertSame(
+            'GET',
+            $mapper->getHTTPMethodFromInterface('Level3\Repository\Getter')
+        );
+
+        $this->assertSame(
+            null,
+            $mapper->getHTTPMethodFromInterface('Foo')
         );
     }
 }

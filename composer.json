@@ -19,7 +19,7 @@
         "shrikeh/teapot": "0.2",
         "symfony/http-foundation": "2.3.*@dev",
         "hampel/json": "1.0.*",
-        "level3/resource": "dev-master"
+        "level3/resource": "0.0.1"
     },
     "require-dev": {
         "mockery/mockery": "0.8.0",
