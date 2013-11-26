@@ -90,7 +90,7 @@ class Response extends BaseResponse
 
         $this->resource->setFormatWriter($this->writer);
 
-        return (string) $this->resource;
+        return $this->resource->__toString();
     }
 
     public function sendContent()
