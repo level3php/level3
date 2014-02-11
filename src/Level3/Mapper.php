@@ -26,11 +26,7 @@ abstract class Mapper
 
     public function setBaseURI($uri)
     {
-        if ($this->doesNotEndInSlash($uri)) {
-            $uri = $this->addSlashToUri($uri);
-        }
-
-        $this->baseURI = $uri;
+        $this->baseURI = $this->removeSlashToUri($uri);
     }
 
     public function setSkipCurieSegments($skip)
@@ -38,18 +34,22 @@ abstract class Mapper
         $this->skipCurieSegments = $skip;
     }
 
-    private function doesNotEndInSlash($uri)
+    private function doesEndInSlash($uri)
     {
         if (!strlen($uri)) {
             return false;
         }
 
-        return $uri[strlen($uri) - 1] != self::SLASH_CHARACTER;
+        return $uri[strlen($uri) - 1] == self::SLASH_CHARACTER;
     }
 
-    private function addSlashToUri($uri)
+    private function removeSlashToUri($uri)
     {
-        return $uri . self::SLASH_CHARACTER;
+        if (!$this->doesEndInSlash($uri)) {
+            return $uri;
+        }
+
+        return substr($uri, 0, strlen($uri)-1);
     }
 
     public function getBaseURI()
@@ -184,6 +184,7 @@ abstract class Mapper
                 $uri .= self::SLASH_CHARACTER . $this->createCurieParamFromName($names[$i]);
             }
         }
+
 
         return $uri;
     }

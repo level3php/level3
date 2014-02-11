@@ -21,7 +21,7 @@ class MapperTest extends TestCase
     {
         $mapper = $this->getMapperMock();
 
-        $expected = 'foo/';
+        $expected = 'foo';
         $mapper->setBaseURI($expected);
 
         $this->assertSame($expected, $mapper->getBaseURI());
@@ -41,8 +41,8 @@ class MapperTest extends TestCase
     {
         $mapper = $this->getMapperMock();
 
-        $expected = 'foo/';
-        $mapper->setBaseURI('foo');
+        $expected = 'foo';
+        $mapper->setBaseURI('foo/');
 
         $this->assertSame($expected, $mapper->getBaseURI());
     }
