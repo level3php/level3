@@ -17,15 +17,12 @@
         "php": ">=5.4.0",
         "psr/log": "~1.0",
         "shrikeh/teapot": "0.2",
-        "symfony/http-foundation": "2.3.*@dev",
+        "symfony/http-foundation": ">=2.4,<2.6-dev",
         "hampel/json": "1.0.*",
         "level3/resource": "0.0.1"
     },
     "require-dev": {
-        "mockery/mockery": "0.8.0",
-        "phpunit/phpunit": "3.7.*",
-        "level3/demo": "*",
-        "level3/behat": "*"
+        "mockery/mockery": "*"
     },
     "autoload": {
         "psr-0": {

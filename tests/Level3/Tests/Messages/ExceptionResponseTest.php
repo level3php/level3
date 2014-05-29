@@ -28,7 +28,7 @@ class ExceptionResponseTest extends TestCase
         $data = $resource->getData();
         $this->assertSame('Exception', $data['type']);
         $this->assertSame('foo', $data['message']);
-        $this->assertCount(13, $data['trace']);
+        $this->assertCount(12, $data['trace']);
     }
 
     public function testCreateFromHTTPException()
@@ -47,7 +47,7 @@ class ExceptionResponseTest extends TestCase
         $data = $resource->getData();
         $this->assertSame('Level3\Exceptions\NotAcceptable', $data['type']);
         $this->assertSame('foo', $data['message']);
-        $this->assertCount(13, $data['trace']);
+        $this->assertCount(12, $data['trace']);
 
         $response->setFormatWriter(new JsonWriter);
 
